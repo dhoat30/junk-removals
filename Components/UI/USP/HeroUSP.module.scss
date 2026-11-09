@@ -1,0 +1,98 @@
+.textUspContainer{ 
+    .textUspWrapper{ 
+        grid-template-columns:290px 290px 290px; 
+        // justify-content: space-between;
+        // gap: 32px; 
+        @media(max-width: 900px){ 
+            grid-template-columns: 1fr 1fr;
+                  justify-content:baseline; 
+
+        }
+        @media(max-width: 700px){ 
+            grid-template-columns: 1fr;
+                  justify-content:center; 
+
+        }
+        .textUSP{ 
+            color: var(--brand-charcoal);
+            justify-content: start;
+            width: 100%;
+        }
+    }
+  
+    .twoColumnsGrid{ 
+        grid-template-columns: 1fr 1fr; 
+        @media(max-width: 700px){ 
+            grid-template-columns: 1fr; 
+        }
+    }
+}
+
+
+/* Equal columns give each benefit the same visual weight. */
+.textUspContainerBox {
+    width: 100%;
+
+    .textUspWrapper {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+
+    .textUSP {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-width: 0;
+        min-height: 100px;
+        padding: 18px;
+        background: var(--light-surface-container-lowest);
+        border: 1px solid var(--light-outline-variant);
+        border-radius: 16px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.025);
+    }
+
+    .iconBadge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 36px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(var(--brand-red-rgb), 0.07);
+        color: var(--light-primary);
+    }
+
+    .icon {
+        font-size: 21px;
+    }
+
+    .benefitText {
+        color: var(--brand-charcoal);
+        font-size: 0.96rem;
+        font-weight: 600;
+        line-height: 1.45;
+        text-wrap: pretty;
+    }
+
+    @media (max-width: 600px) {
+        .textUspWrapper {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .textUSP {
+            min-height: 72px;
+            padding: 14px 16px;
+            border-radius: 14px;
+        }
+
+        .benefitText {
+            font-size: 0.94rem;
+        }
+    }
+}

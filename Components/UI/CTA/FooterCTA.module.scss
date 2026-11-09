@@ -1,0 +1,49 @@
+.section{ 
+  padding: 40px 0;
+  @media (max-width: 900px) {
+    padding: 24px 0;
+  }
+  .wrapper{ 
+    padding: 120px 0;
+    background:
+      radial-gradient(circle at 18% 24%, rgba(var(--brand-accent-rgb), 0.18), transparent 28%),
+      linear-gradient(135deg, var(--light-primary) 0%, var(--light-primary-container) 52%, var(--light-secondary) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 32px;
+    box-shadow: 0 24px 60px rgba(var(--brand-red-rgb), 0.16);
+
+    @media (max-width: 900px) {
+      padding: 56px 16px;
+    }
+
+    .contentWrapper{ 
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+  }
+}
+
+.quoteButton :global(.MuiButton-root) {
+  background: #fff !important;
+  color: var(--light-primary) !important;
+  border-radius: 999px !important;
+  font-weight: 800 !important;
+  padding-inline: 24px !important;
+
+  &:hover {
+    background: var(--brand-mist) !important;
+  }
+}
+
+.phoneButton :global(.MuiButton-root) {
+  border-color: rgba(255, 255, 255, 0.8) !important;
+  color: #fff !important;
+  border-radius: 999px !important;
+  padding-inline: 24px !important;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: #fff !important;
+  }
+}

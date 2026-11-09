@@ -1,0 +1,128 @@
+.section {
+  padding: 88px 0;
+  position: relative;
+
+  @media (max-width: 700px) {
+    padding: 48px 0;
+  }
+}
+
+.container {
+  position: relative;
+}
+
+.header {
+  display: grid;
+  column-gap: 56px;
+  row-gap: 18px;
+  grid-template-columns: minmax(0, 560px) minmax(0, 1fr);
+  align-items: end;
+
+  @media (max-width: 980px) {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+  }
+}
+
+.title {
+  color: var(--light-on-surface) !important;
+  font-size: clamp(2rem, 3vw, 3.1rem) !important;
+  letter-spacing: -0.04em !important;
+  line-height: 1.04 !important;
+}
+
+.description {
+  color: var(--light-on-surface-variant) !important;
+  font-size: 1.05rem !important;
+  line-height: 1.7 !important;
+  max-width: 620px;
+}
+
+.grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 34px;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background:
+    radial-gradient(circle at top right, rgba(var(--brand-accent-rgb), 0.12), transparent 26%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 244, 244, 0.96) 100%);
+  border: 1px solid rgba(var(--brand-red-rgb), 0.1);
+  border-radius: 24px;
+  box-shadow: 0 20px 54px rgba(var(--brand-red-rgb), 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 100%;
+  padding: 24px 22px 24px;
+  position: relative;
+}
+
+.cardNumber {
+  align-items: center;
+  background: rgba(var(--brand-red-rgb), 0.94);
+  border-radius: 999px;
+  color: #fff;
+  display: inline-flex;
+  font-size: 0.72rem;
+  font-weight: 800;
+  height: 34px;
+  justify-content: center;
+  letter-spacing: 0.14em;
+  width: 34px;
+}
+
+.cardTitle {
+  color: var(--brand-charcoal) !important;
+  font-size: 1.32rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
+  line-height: 1.12 !important;
+}
+
+.cardDescription {
+  color: var(--light-on-surface-variant);
+  font-size: 0.98rem;
+  line-height: 1.65;
+
+  ul {
+    display: grid;
+    gap: 10px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    padding-left: 22px;
+    position: relative;
+  }
+
+  li::before {
+    background: var(--light-tertiary);
+    border-radius: 999px;
+    content: "";
+    height: 8px;
+    left: 0;
+    position: absolute;
+    top: 0.55em;
+    width: 8px;
+  }
+}
+
+@media (max-width: 700px) {
+  .card {
+    border-radius: 20px;
+    padding: 20px 18px;
+  }
+}
