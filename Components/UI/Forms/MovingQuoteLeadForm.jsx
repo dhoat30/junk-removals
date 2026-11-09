@@ -83,7 +83,7 @@ function isFieldValid(field, value) {
 }
 
 export default function MovingQuoteLeadForm({
-  formName = "Get a Free Property Care Quote",
+  formName = "Get a Free Junk Removal Quote",
   title = "Get Your Free Quote",
   subtitle = "Takes 60 seconds. No obligation whatsoever.",
   highlightText = "Quick Response, Auckland-Wide",
@@ -262,7 +262,7 @@ Submitted: ${dayjs(formattedDate).format("DD/MM/YYYY HH:mm")}`;
 
         sendFormSubmissionToGoogleTagManager({
           eventName: "quote_form_submission",
-          formName: "Property Care Quote",
+          formName: "Junk Removal Quote",
           transactionId,
           conversionValue: 0,
           currency: "NZD",

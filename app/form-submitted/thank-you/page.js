@@ -1,8 +1,9 @@
 import Header from '@/Components/UI/Header/Header';
 import ThankYou from '@/Components/UI/ThankYou/ThankYou';
+import { SITE_URL } from '@/utils/siteMetadata';
 
 export const metadata = {
-    metadataBase: new URL('https://bestnzmovers.co.nz'),
+    metadataBase: new URL(SITE_URL),
     title: 'Thank You',
     robots: {
         index: false,

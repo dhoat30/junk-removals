@@ -1,5 +1,5 @@
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 
-    (process.env.NODE_ENV === "production" ? "https://quote.boplawnsandgardens.co.nz" : "http://localhost:3000");
+    (process.env.NODE_ENV === "production" ? "https://www.junkremovals.co.nz" : "http://localhost:3000");
     const siteName = "Junk Removals"
 
 // bundle analyzer e

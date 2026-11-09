@@ -136,13 +136,7 @@ export async function sendHubspotSubmission(payload, image, fetcher = fetch) {
     body: JSON.stringify({
       submittedAt: Date.now(),
       fields,
-      legalConsentOptions: {
-        consent: {
-          consentToProcess: true,
-          text: "I agree to allow Example Company to store and process my personal data.",
-          communications: [{ value: true, subscriptionTypeId: 999, text: "I agree to receive marketing communications from Example Company." }],
-        },
-      },
+
     }),
   });
   if (!response.ok) throw new SubmissionError("HubSpot submission failed. Please try again.", 502);

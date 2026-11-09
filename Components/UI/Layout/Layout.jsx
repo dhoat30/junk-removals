@@ -15,6 +15,7 @@ import GoogleReviewsCarousel from "../GoogleReviews/GoogleReviewsCarousel";
 import GoogleReviewsMasonry from "../GoogleReviews/GoogleReviewsMasonry";
 import UspTable from "./Sections/UspTable/UspTable";
 import VerticalTabs from "./Sections/VerticalTabs/VerticalTabs";
+import AreasCoveredSection from "./Sections/AreasCoveredSection/AreasCoveredSection";
 import ServiceCardsSection from "./Sections/ServiceCardsSection/ServiceCardsSection";
 import CardsSection from "./Sections/CardsSection/CardsSection";
 import TabsSection from "./Sections/TabsSection/TabsSection";
@@ -101,6 +102,17 @@ export default function Layout({
           subtitle={section.subtitle}
           description={section.description}
           cards={section.cards}
+        />
+      );
+    }
+    if (section.acf_fc_layout === "areas_covered") {
+      return (
+        <AreasCoveredSection
+          key={index}
+          title={section.title}
+          description={section.description}
+          areas={section.areas}
+          quoteHref={section.quote_link?.url}
         />
       );
     }

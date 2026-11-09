@@ -4,54 +4,33 @@ import Header from '@/Components/UI/Header/Header'
 import {getSinglePostData} from '@/utils/fetchData'
 import Footer from '@/Components/UI/Footer/Footer'
 import Layout from '@/Components/UI/Layout/Layout'
-import GoogleReviewsMasonry from '@/Components/UI/GoogleReviews/GoogleReviewsMasonry'
+import { notFound } from "next/navigation";
+import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "@/utils/siteMetadata";
+import { DEFAULT_AREAS_COVERED_SECTION } from "@/utils/aucklandCoverage";
 import { DEFAULT_SERVICE_CARDS_SECTION } from "@/utils/junkRemovalServices";
 import reviewsData from "@/data/google-reviews.json";
 
 
 
-export async function generateMetadata(props, parent) {
-    const params = await props.params;
-    // read route params
-    const slug = params.slug
-
-    // fetch data
-    const data = await getSinglePostData( 'junk-removals', '/wp-json/wp/v2/cleaning-business')
-
-    // optionally access and extend (rather than replace) parent metadata
-    const previousImages = (await parent).openGraph?.images || []
-    if (data.length > 0) {
-        const seoData = data[0].yoast_head_json
-        return {
-            title: seoData.title,
-            description: seoData.description,
-            metadataBase: new URL(process.env.siteUrl),
-            openGraph: {
-                title: seoData.title,
-                description: seoData.description,
-                url: process.env.siteUrl,
-                siteName: process.env.siteName,
-                images: [
-                    {
-                        url: seoData?.og_image && seoData?.og_image[0]?.url,
-                        width: 800,
-                        height: 600,
-                    }, {
-                        url: seoData?.og_image && seoData?.og_image[0].url,
-                        width: 1800,
-                        height: 1600,
-                    },
-
-                ],
-                type: 'website',
-            },
-        }
-    }
-}
+export const metadata = {
+    title: "Junk Removal Auckland | Same-Day Pickups | Junk Removals",
+    description: SITE_DESCRIPTION,
+    metadataBase: new URL(SITE_URL),
+    alternates: { canonical: "/" },
+    openGraph: {
+        title: "Junk Removal Auckland | Junk Removals",
+        description: SITE_DESCRIPTION,
+        url: SITE_URL,
+        siteName: SITE_NAME,
+        locale: "en_NZ",
+        type: "website",
+        images: [{ url: "/logo.png", alt: SITE_NAME }],
+    },
+};
 
   export default async function Home() {
     const data = await getSinglePostData( 'junk-removals', '/wp-json/wp/v2/cleaning-business')
-    if(!data) return {notFound: true}
+    if (!data?.length) notFound()
     const sections = [...(data[0]?.acf?.layout || [])]
     // Show the services now; a CMS service_cards block takes over when added.
     if (!sections.some((section) => section.acf_fc_layout === "service_cards")) {
@@ -60,12 +39,10 @@ export async function generateMetadata(props, parent) {
         )
         sections.splice(heroIndex + 1, 0, DEFAULT_SERVICE_CARDS_SECTION)
     }
-    // The ACF layout has no "show_reviews" block yet, so render the reviews
-    // here. If that block is added in WordPress, Layout renders them instead
-    // and this guard keeps the section from appearing twice.
-    const hasReviewsSection = sections?.some(
-        (section) => section?.acf_fc_layout === "show_reviews"
-    )
+    if (!sections.some((section) => ["areas_covered", "locations_covered"].includes(section.acf_fc_layout) || (section.acf_fc_layout === "show_locations" && section.show_locations))) {
+        const servicesIndex = sections.findIndex((section) => section.acf_fc_layout === "service_cards")
+        sections.splice(servicesIndex + 1, 0, DEFAULT_AREAS_COVERED_SECTION)
+    }
     return (
         <>
             <Header />
@@ -73,15 +50,8 @@ export async function generateMetadata(props, parent) {
 
             <Layout sections={sections}  googleReviewsData={reviewsData}
 />
-            {/* {!hasReviewsSection && <GoogleReviewsMasonry data={reviewsData} />} */}
-                {/* <Layout sections={postData[0]?.acf?.sections} /> */}
-                {/* <USP showTitle={true} statsArray={options.stats.items} cards={options.usp.items} title={options.usp.section_title} description={options.usp.section_description} /> */}
-            
-
             </main>
-            <Footer showFooterCta={false
-
-            } footerCtaData={{title: "Get a quote for your property", description: "Tell us what needs doing and we'll come back with a price, usually the same day. Lawn mowing from $35, no fixed-term contract.", cta_link: {url: "/#get-free-quote", title: "GET A QUOTE"}}  }/>
+            <Footer showFooterCta={false} />
         </>
     )
 }

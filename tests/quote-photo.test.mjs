@@ -89,6 +89,7 @@ test("no photo skips the HubSpot Files API", async () => {
     calls++;
     assert.match(url, /secure\/submit/);
     assert.deepEqual(JSON.parse(options.body).fields, payload.hubspotFormObject);
+    assert.equal(JSON.parse(options.body).legalConsentOptions, undefined);
     return ok();
   });
   assert.equal(calls, 1);
