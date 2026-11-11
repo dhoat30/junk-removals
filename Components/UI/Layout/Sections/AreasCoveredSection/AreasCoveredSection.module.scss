@@ -40,6 +40,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
+  align-items: start;
 }
 
 .areaCard {
@@ -54,8 +55,18 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 20px;
+  cursor: pointer;
+  list-style: none;
+
+  &::-webkit-details-marker { display: none; }
+  &::after { content: "+"; font-size: 24px; color: var(--light-primary); }
+  &:focus-visible { outline: 2px solid var(--light-primary); outline-offset: 6px; border-radius: 4px; }
 }
+
+.areaCard[open] .areaHeading { margin-bottom: 20px; }
+.areaCard[open] .areaHeading::after { content: "−"; }
+.count { margin-left: auto; color: var(--light-on-surface-variant); font-size: 0.85rem; }
+.areaNote { font-size: 0.9rem; line-height: 1.5; color: var(--light-on-surface-variant); margin: 0 0 16px; }
 
 .locationIcon {
   color: var(--light-primary);
@@ -72,6 +83,7 @@
 }
 
 .suburbs {
+  list-style: none;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;

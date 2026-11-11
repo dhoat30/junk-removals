@@ -8,7 +8,7 @@ import styles from "./AreasCoveredSection.module.scss";
 
 export default function AreasCoveredSection({
   title = "Junk removal across Auckland",
-  description = "We cover all of Auckland and nearby suburbs. Wherever you are, we'll come to you and take care of the heavy lifting.",
+  description = "Browse Auckland suburbs and surrounding localities below. Send us your address for a fixed-price junk removal quote.",
   areas = AUCKLAND_COVERAGE_AREAS,
   quoteHref = "/#get-free-quote",
 }) {
@@ -33,13 +33,15 @@ export default function AreasCoveredSection({
 
         <div className={styles.grid}>
           {areas.map((area) => (
-            <article className={styles.areaCard} key={area.title}>
-              <div className={styles.areaHeading}>
+            <details className={styles.areaCard} key={area.title}>
+              <summary className={styles.areaHeading}>
                 <LocationOnOutlinedIcon className={styles.locationIcon} aria-hidden="true" />
                 <Typography variant="h5" component="h3" className={styles.areaTitle}>
                   {area.title}
                 </Typography>
-              </div>
+                <span className={styles.count}>{area.suburbs?.length || 0}</span>
+              </summary>
+              {area.note && <p className={styles.areaNote}>{area.note}</p>}
               <ul className={styles.suburbs}>
                 {area.suburbs?.map((suburb) => {
                   const label = typeof suburb === "string" ? suburb : suburb.name;
@@ -50,12 +52,12 @@ export default function AreasCoveredSection({
                   );
                 })}
               </ul>
-            </article>
+            </details>
           ))}
         </div>
 
         <Typography variant="body2" component="p" className={styles.coverageNote}>
-          These are just some of the suburbs we cover. Our service is Auckland-wide.
+          Open an area to browse its suburbs and localities. Rural and island pickups are subject to availability — send us your address to confirm.
         </Typography>
 
         <div className={styles.callout}>
