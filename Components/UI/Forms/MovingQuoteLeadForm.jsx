@@ -45,9 +45,9 @@ const FORM_FIELDS = [
     id: "phone",
     label: "Phone number",
     type: "tel",
-    required: false,
+    required: true,
     autoComplete: "tel",
-    errorMessage: "Enter at least 7 digits, or leave the phone number blank.",
+    errorMessage: "Enter a phone number with at least 7 digits.",
     validation: (value) => {
       const cleanPhone = (value || "").replace(/[^0-9]/g, "");
       return cleanPhone.length > 6;
