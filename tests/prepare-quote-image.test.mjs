@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import sharp from "sharp";
 import { prepareQuoteImage } from "../utils/prepareQuoteImage.mjs";
-import { MAX_QUOTE_IMAGE_BYTES, MAX_QUOTE_SOURCE_IMAGE_BYTES } from "../utils/quoteImage.mjs";
+import { MAX_QUOTE_IMAGE_BYTES, MAX_QUOTE_SOURCE_IMAGE_BYTES, isHeicImage, quoteImageError } from "../utils/quoteImage.mjs";
 import { submitQuote } from "../utils/submitQuote.mjs";
 import { readSubmission } from "../utils/server/formSubmissions.mjs";
 
@@ -64,8 +64,49 @@ test("reduces quality and dimensions until the upload fits", async () => {
 });
 
 test("rejects unsupported and over-20-MB sources before decoding", async () => {
-  await assert.rejects(prepareQuoteImage(new File(["svg"], "photo.svg", { type: "image/svg+xml" }), {}), /JPG, PNG or WebP/);
+  await assert.rejects(prepareQuoteImage(new File(["svg"], "photo.svg", { type: "image/svg+xml" }), {}), /JPG, PNG, WebP or HEIC/);
   await assert.rejects(prepareQuoteImage({ type: "image/jpeg", size: MAX_QUOTE_SOURCE_IMAGE_BYTES + 1 }, {}), /20 MB/);
+});
+
+test("HEIC and HEIF sources are converted even below the upload limit", async () => {
+  for (const [name, type] of [["iphone.HEIC", "image/heic"], ["iphone.heif", "image/heif"], ["iphone.HEIC", ""], ["iphone.heif", "application/octet-stream"]]) {
+    const file = new File(["HEIC source"], name, { type });
+    const { browser, calls } = fakeBrowser();
+    let conversions = 0;
+    const prepared = await prepareQuoteImage(file, browser, async source => {
+      conversions++;
+      assert.equal(source, file);
+      return jpeg;
+    });
+    assert.equal(conversions, 1);
+    assert.equal(prepared.name, "iphone.jpg");
+    assert.equal(prepared.type, "image/jpeg");
+    assert.equal(quoteImageError(prepared), "");
+    assert.deepEqual(calls.sizes, [[2560, 1920]]);
+    assert.deepEqual(calls.revoked, ["blob:photo"]);
+    for (const endpoint of ["/api/sendmail", "/api/submit-hubspot-form"]) {
+      await submitQuote(endpoint, {}, prepared, async (url, options) => {
+        const { image } = await readSubmission(new Request(`https://example.com${url}`, options));
+        assert.equal(image.type, "image/jpeg");
+        return Response.json({ success: true, imageReceived: true });
+      });
+    }
+  }
+});
+
+test("iOS JPEGs retaining an HEIC filename bypass HEIC conversion", async () => {
+  const file = new File([jpeg], "iphone.heic", { type: "image/jpeg" });
+  assert.equal(isHeicImage(file), false);
+  assert.equal(await prepareQuoteImage(file, {}, () => assert.fail("must not convert JPEG")), file);
+});
+
+test("HEIC conversion errors and invalid results are visible, and oversized sources are rejected first", async () => {
+  const file = new File(["broken"], "iphone.heic", { type: "image/heic" });
+  for (const converter of [async () => { throw new Error("decoder failed"); }, async () => null, async () => new Blob([])]) {
+    await assert.rejects(prepareQuoteImage(file, {}, converter), /HEIC photo could not be converted/);
+  }
+  await assert.rejects(prepareQuoteImage({ name: "iphone.heic", type: "image/heic", size: MAX_QUOTE_SOURCE_IMAGE_BYTES + 1 }, {}, () => assert.fail("must reject before converting")), /20 MB/);
+  assert.match(quoteImageError(file), /JPG, PNG or WebP/); // Server still accepts only prepared formats.
 });
 
 test("decode and encoding failures report errors and release the preview URL", async () => {

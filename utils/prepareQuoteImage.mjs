@@ -1,12 +1,30 @@
-import { MAX_QUOTE_IMAGE_BYTES, MAX_QUOTE_SOURCE_IMAGE_BYTES, quoteImageError } from "./quoteImage.mjs";
+import { MAX_QUOTE_IMAGE_BYTES, isHeicImage, quoteSourceImageError } from "./quoteImage.mjs";
+
+async function convertHeic(file) {
+  // Only load the decoder when needed; keep it out of server rendering.
+  const { heicTo } = await import("heic-to/csp");
+  return heicTo({ blob: file, type: "image/jpeg", quality: 0.85 });
+}
 
 // Resize in the browser so full-size phone photos never hit the upload API.
-export async function prepareQuoteImage(file, browser = globalThis) {
-  const error = quoteImageError(file, MAX_QUOTE_SOURCE_IMAGE_BYTES);
+export async function prepareQuoteImage(file, browser = globalThis, heicConverter = convertHeic) {
+  const error = quoteSourceImageError(file);
   if (error) throw new Error(error);
-  if (!file || file.size <= MAX_QUOTE_IMAGE_BYTES) return file;
+  if (!file) return file;
+  const isHeic = isHeicImage(file);
+  if (!isHeic && file.size <= MAX_QUOTE_IMAGE_BYTES) return file;
 
-  const url = browser.URL.createObjectURL(file);
+  let source = file;
+  if (isHeic) {
+    try {
+      source = await heicConverter(file);
+      if (!source || source.type !== "image/jpeg" || !source.size) throw new Error("Invalid conversion");
+    } catch {
+      throw new Error("This HEIC photo could not be converted. Please choose another photo or export it as a JPG.");
+    }
+  }
+
+  const url = browser.URL.createObjectURL(source);
   try {
     const image = new browser.Image();
     await new Promise((resolve, reject) => {

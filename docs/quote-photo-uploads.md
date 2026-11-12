@@ -1,6 +1,6 @@
 # Hero quote photos
 
-The existing hero form fields remain unchanged. A visitor can optionally add one JPG, PNG or WebP image up to 20 MiB, preview it, change it, or remove it. Photos over 3 MiB are resized in the browser to a JPEG no larger than 3 MiB before submission. Resizing starts at a maximum dimension of 2560 pixels and reduces quality and dimensions if needed; smaller files pass through unchanged. The submit button waits for photo preparation to finish. Both APIs retain the 3 MiB upload limit and validate the file size, declared type, actual image format, decoding, and pixel limit before forwarding it.
+The existing hero form fields remain unchanged. A visitor can optionally add one JPG, PNG, WebP, HEIC or HEIF image up to 20 MiB, preview it, change it, or remove it. HEIC/HEIF photos are converted to JPEG locally using a lazily loaded `heic-to/csp` decoder, then resized before upload. Other photos over 3 MiB are also resized in the browser to a JPEG no larger than 3 MiB before submission. Resizing starts at a maximum dimension of 2560 pixels and reduces quality and dimensions if needed; smaller JPG, PNG and WebP files pass through unchanged. The submit button waits for photo preparation to finish. Both APIs retain the 3 MiB upload limit and accept only JPG, PNG and WebP, validating the file size, declared type, actual image format, decoding, and pixel limit before forwarding it. Conversion failures appear beside the picker and block submission until the visitor selects a valid photo; an HEIC file is never silently omitted or forwarded unchanged.
 
 The hero submits multipart form data containing `payload` (the existing JSON) and optional `image`. Existing forms can continue submitting JSON to the same endpoints.
 
@@ -17,6 +17,8 @@ Existing variables are reused: `HUBSPOT_API_KEY`, `NEXT_PUBLIC_HUBSPOT_PORTAL_ID
 ## Verification
 
 Run `node --test tests/*.test.mjs` and `npm run build`. The automated checks use mocked browser decoding/canvas and providers, verify the resized file passes server validation for both destinations, and never send email or create live HubSpot contacts/files. The token permissions have been verified. Submit a real quote to verify delivery to both destinations with your account; a live end-to-end submission has not been sent during automated testing.
+
+HEIC conversion was also checked in headless Chrome using libheif's `examples/example.heic`: the real decoder produced a 1280 × 854 JPEG (352,091 bytes), displayed a preview, and sent identical JPEG attachments to both intercepted quote endpoints. The resulting file passed the actual server image validator. A malformed HEIC displayed the conversion error. No live HubSpot submission or admin email was sent in this check.
 
 References: [HubSpot Files API](https://developers.hubspot.com/docs/api-reference/legacy/files/guide), [authenticated form file links](https://developers.hubspot.com/changelog/upcoming-forms-file-upload-access?hs_amp=true), [Mailgun attachments](https://documentation.mailgun.com/docs/mailgun/user-manual/sending-messages/send-attachments).
 

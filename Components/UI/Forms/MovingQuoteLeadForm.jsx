@@ -11,7 +11,7 @@ import Typography from "@mui/material/Typography";
 import BoltIcon from "@mui/icons-material/Bolt";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternateOutlined";
-import { quoteImageError, QUOTE_IMAGE_TYPES } from "@/utils/quoteImage.mjs";
+import { quoteImageError, QUOTE_IMAGE_SOURCE_ACCEPT } from "@/utils/quoteImage.mjs";
 import { prepareQuoteImage } from "@/utils/prepareQuoteImage.mjs";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Input from "./InputFields/Input";
@@ -389,14 +389,14 @@ Submitted: ${dayjs(formattedDate).format("DD/MM/YYYY HH:mm")}`;
             Photo of your items <span>(optional)</span>
           </Typography>
           <Typography component="p" id="quote-photo-help" className={styles.uploadHelp}>
-            Show us what needs to go for a more accurate quote. JPG, PNG or WebP, up to 20 MB. Larger photos are automatically resized.
+            Show us what needs to go for a more accurate quote. JPG, PNG, WebP or HEIC, up to 20 MB. iPhone HEIC photos are converted automatically, and larger photos are resized.
           </Typography>
           <label className={styles.uploadPicker}>
             <input
               ref={imageInput}
               type="file"
               name="image"
-              accept={QUOTE_IMAGE_TYPES.join(",")}
+              accept={QUOTE_IMAGE_SOURCE_ACCEPT}
               onChange={handleImageChange}
               disabled={isLoading}
               aria-label={image ? "Change photo of your items" : "Upload a photo of your items"}
@@ -407,7 +407,7 @@ Submitted: ${dayjs(formattedDate).format("DD/MM/YYYY HH:mm")}`;
             <AddPhotoAlternateOutlinedIcon aria-hidden="true" />
             <span>{isPreparingImage ? "Preparing photo…" : image ? "Change photo" : "Choose a photo"}</span>
           </label>
-          {isPreparingImage ? <p role="status">Resizing your photo for upload…</p> : null}
+          {isPreparingImage ? <p role="status">Preparing your photo for upload…</p> : null}
           {image ? (
             <Box className={styles.uploadSelection}>
               {imagePreview ? (
