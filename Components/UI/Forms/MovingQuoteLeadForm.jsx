@@ -12,6 +12,7 @@ import BoltIcon from "@mui/icons-material/Bolt";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternateOutlined";
 import { quoteImageError, QUOTE_IMAGE_TYPES } from "@/utils/quoteImage.mjs";
+import { prepareQuoteImage } from "@/utils/prepareQuoteImage.mjs";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Input from "./InputFields/Input";
 import GoogleAutocomplete from "@/Components/GoogleMaps/GoogleAutoComplete";
@@ -46,7 +47,7 @@ const FORM_FIELDS = [
     type: "tel",
     required: false,
     autoComplete: "tel",
-    errorMessage: "Please enter a valid New Zealand phone number",
+    errorMessage: "Enter at least 7 digits, or leave the phone number blank.",
     validation: (value) => {
       const cleanPhone = (value || "").replace(/[^0-9]/g, "");
       return cleanPhone.length > 6;
@@ -101,7 +102,9 @@ export default function MovingQuoteLeadForm({
   const [image, setImage] = useState(null);
   const [imageError, setImageError] = useState("");
   const [imagePreview, setImagePreview] = useState("");
+  const [isPreparingImage, setIsPreparingImage] = useState(false);
   const imageInput = useRef(null);
+  const imageSelection = useRef(0);
   const deliveries = useRef(null);
 
   useEffect(() => {
@@ -114,15 +117,29 @@ export default function MovingQuoteLeadForm({
     return () => URL.revokeObjectURL(url);
   }, [image]);
 
-  const handleImageChange = (event) => {
+  const handleImageChange = async (event) => {
     const file = event.target.files?.[0] || null;
-    const validationError = quoteImageError(file);
-    setImageError(validationError);
-    setImage(validationError ? null : file);
-    if (validationError) event.target.value = "";
+    const input = event.target;
+    const selection = ++imageSelection.current;
+    setImageError("");
+    setImage(null);
+    setIsPreparingImage(true);
+    try {
+      const prepared = await prepareQuoteImage(file);
+      if (selection === imageSelection.current) setImage(prepared);
+    } catch (error) {
+      if (selection === imageSelection.current) {
+        setImageError(error.message || "Your photo could not be resized. Please choose another photo.");
+        input.value = "";
+      }
+    } finally {
+      if (selection === imageSelection.current) setIsPreparingImage(false);
+    }
   };
 
   const removeImage = () => {
+    imageSelection.current++;
+    setIsPreparingImage(false);
     setImage(null);
     setImageError("");
     if (imageInput.current) imageInput.current.value = "";
@@ -173,14 +190,19 @@ export default function MovingQuoteLeadForm({
     });
 
     setErrors(nextErrors);
+    const firstInvalidField = Object.keys(nextErrors)[0];
+    if (firstInvalidField) {
+      document.getElementById(firstInvalidField)?.focus();
+    }
     return Object.keys(nextErrors).length === 0;
   };
 
   const submitHandler = async (event) => {
     event.preventDefault();
 
-    // Read the actual file input at submit time as well as React state.
-    const selectedImage = imageInput.current?.files?.[0] || image;
+    if (isPreparingImage) return;
+    // Use the prepared photo, not the full-size original in the file input.
+    const selectedImage = image;
     const selectedImageError = quoteImageError(selectedImage);
     if (!validateForm() || imageError || selectedImageError) {
       if (selectedImageError) setImageError(selectedImageError);
@@ -367,7 +389,7 @@ Submitted: ${dayjs(formattedDate).format("DD/MM/YYYY HH:mm")}`;
             Photo of your items <span>(optional)</span>
           </Typography>
           <Typography component="p" id="quote-photo-help" className={styles.uploadHelp}>
-            Show us what needs to go for a more accurate quote. JPG, PNG or WebP, up to 3 MB.
+            Show us what needs to go for a more accurate quote. JPG, PNG or WebP, up to 20 MB. Larger photos are automatically resized.
           </Typography>
           <label className={styles.uploadPicker}>
             <input
@@ -383,8 +405,9 @@ Submitted: ${dayjs(formattedDate).format("DD/MM/YYYY HH:mm")}`;
               className={styles.uploadInput}
             />
             <AddPhotoAlternateOutlinedIcon aria-hidden="true" />
-            <span>{image ? "Change photo" : "Choose a photo"}</span>
+            <span>{isPreparingImage ? "Preparing photo…" : image ? "Change photo" : "Choose a photo"}</span>
           </label>
+          {isPreparingImage ? <p role="status">Resizing your photo for upload…</p> : null}
           {image ? (
             <Box className={styles.uploadSelection}>
               {imagePreview ? (
@@ -405,7 +428,7 @@ Submitted: ${dayjs(formattedDate).format("DD/MM/YYYY HH:mm")}`;
           type="submit"
           variant="contained"
           size="large"
-          disabled={isLoading}
+          disabled={isLoading || isPreparingImage}
           className={styles.submitButton}
         >
           {isLoading ? "Sending your quote request…" : submitButtonText}

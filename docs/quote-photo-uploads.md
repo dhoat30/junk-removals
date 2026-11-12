@@ -1,12 +1,12 @@
 # Hero quote photos
 
-The existing hero form fields remain unchanged. A visitor can optionally add one JPG, PNG or WebP image up to 3 MiB, preview it, change it, or remove it. Both APIs validate the file size, declared type, actual image format, decoding, and pixel limit before forwarding it.
+The existing hero form fields remain unchanged. A visitor can optionally add one JPG, PNG or WebP image up to 20 MiB, preview it, change it, or remove it. Photos over 3 MiB are resized in the browser to a JPEG no larger than 3 MiB before submission. Resizing starts at a maximum dimension of 2560 pixels and reduces quality and dimensions if needed; smaller files pass through unchanged. The submit button waits for photo preparation to finish. Both APIs retain the 3 MiB upload limit and validate the file size, declared type, actual image format, decoding, and pixel limit before forwarding it.
 
 The hero submits multipart form data containing `payload` (the existing JSON) and optional `image`. Existing forms can continue submitting JSON to the same endpoints.
 
 - HubSpot: uploads the image to `/quote-photos` using the Files API with `PRIVATE` access. The hero maps its address to `property_address` and a verified signed image URL to the new `junk_photo` file field. Only fields present on the current HubSpot form are submitted; quote details still appear in the admin email. Other forms without a configured file field retain the `message` reference fallback. The signed source URL lets HubSpot import the photo bytes into its private form-upload storage. Before submission, the server downloads the signed URL without bearer credentials and checks the MIME type, decoded format, dimensions, and successful image decoding; metadata rewrites by HubSpot are allowed. Staff sign into HubSpot to view the resulting form attachment. Never pass a login-required redirect URL to a form file field: HubSpot imports the login HTML as a file.
 - Admin email: Mailgun receives the image as a multipart `attachment`, alongside the existing quote details and recipient (`EMAIL_ADDRESS`).
-- The form uses a fresh multipart request per provider and reads the actual selected file at submission time. Requests declare whether a photo is expected; both endpoints reject a missing expected photo and explicitly confirm image receipt. The page redirects and records conversions only when both providers succeed and confirm the photo. An unchanged request retried in the same mounted form skips a provider that has already succeeded. Reloading the page resets this retry state.
+- The form uses a fresh multipart request per provider with the prepared photo held in state, rather than the oversized original in the file input. Requests declare whether a photo is expected; both endpoints reject a missing expected photo and explicitly confirm image receipt. The page redirects and records conversions only when both providers succeed and confirm the photo. An unchanged request retried in the same mounted form skips a provider that has already succeeded. Reloading the page resets this retry state.
 
 ## HubSpot configuration
 
@@ -16,7 +16,7 @@ Existing variables are reused: `HUBSPOT_API_KEY`, `NEXT_PUBLIC_HUBSPOT_PORTAL_ID
 
 ## Verification
 
-Run `node --test tests/quote-photo.test.mjs` and `npm run build`. The automated checks use mocked providers and never send email or create live HubSpot contacts/files. The token permissions have been verified. Submit a real quote to verify delivery to both destinations with your account; a live end-to-end submission has not been sent during automated testing.
+Run `node --test tests/*.test.mjs` and `npm run build`. The automated checks use mocked browser decoding/canvas and providers, verify the resized file passes server validation for both destinations, and never send email or create live HubSpot contacts/files. The token permissions have been verified. Submit a real quote to verify delivery to both destinations with your account; a live end-to-end submission has not been sent during automated testing.
 
 References: [HubSpot Files API](https://developers.hubspot.com/docs/api-reference/legacy/files/guide), [authenticated form file links](https://developers.hubspot.com/changelog/upcoming-forms-file-upload-access?hs_amp=true), [Mailgun attachments](https://documentation.mailgun.com/docs/mailgun/user-manual/sending-messages/send-attachments).
 

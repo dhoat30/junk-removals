@@ -389,7 +389,7 @@ export default function Input({
         fullWidth
         autoComplete={autoComplete}
         helperText={isInvalid && errorMessage}
-        error={required ? isInvalid : null}
+        error={Boolean(isInvalid)}
         multiline={type === "textarea" ? true : false}
         minRows={type === "textarea" ? props.minRows || 3 : null}
         {...props}
