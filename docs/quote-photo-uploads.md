@@ -13,6 +13,8 @@ Both endpoints accept repeated multipart `image` parts and validate the maximum 
 
 Existing forms can continue submitting JSON without photos, and legacy requests with one photo remain accepted.
 
+The global render-definition endpoint returns the account's region in `x-origin-hublet`. File uploads and the final formsnext submission use that regional host (`forms-ap1.hsforms.com` for this account). Unlike the definition endpoint, the global upload endpoint rejects this account with HTTP 488 and `correctHublet: "ap1"`. If the region header is missing, the server permits one retry after that explicit wrong-region rejection, using only a validated HubSpot region. It does not retry an accepted upload or an ambiguous failure. `HUBSPOT_REGION` is an optional fallback; normal operation discovers the region automatically.
+
 ## HubSpot configuration
 
 The private app behind `HUBSPOT_API_KEY` needs `files.write` to upload photos and `files.read` for file access (older apps may expose the combined `files` scope). These are separate from `forms-uploaded-files`. The website token was verified with `files.read`, `files.write`, `forms`, and `forms-uploaded-files` on 8 November 2026. No token rotation was needed. Photo uploads fail visibly rather than dropping the photo. Submissions without photos continue using the existing form API.
@@ -22,6 +24,8 @@ Existing variables are reused: `HUBSPOT_API_KEY`, `NEXT_PUBLIC_HUBSPOT_PORTAL_ID
 ## Verification
 
 Run `node --test tests/*.test.mjs` and `npm run build`. The automated checks use mocked browser decoding/canvas and providers, verify the resized file passes server validation for both destinations, and never send email or create live HubSpot contacts/files. Tests cover zero, one, two and ten photos, eleven-photo rejection, missing/corrupt parts, aggregate compression, partial receipts and provider failures. No live end-to-end quote was sent during this change; provider delivery tests use mocked responses.
+
+The reported multi-photo upload error was reproduced against the live global endpoint: HTTP 488 identified `ap1` as the correct region. Uploading the same two generated JPEGs to the regional endpoint returned HTTP 202 and an upload GUID. The corrected helper was then exercised with ten generated JPEGs: the real definition and upload calls succeeded, and the final form POST was intercepted to verify it also targeted `ap1`. No contact, quote submission or email was created by these diagnostics. Regression tests cover `ap1`, `eu1` and default-region routing, plus bounded recovery when the region header is absent.
 
 HEIC conversion was also checked in headless Chrome using libheif's `examples/example.heic`: the real decoder produced a 1280 × 854 JPEG (352,091 bytes), displayed a preview, and sent identical JPEG attachments to both intercepted quote endpoints. The resulting file passed the actual server image validator. A malformed HEIC displayed the conversion error. No live HubSpot submission or admin email was sent in this check.
 

@@ -2,6 +2,11 @@
 // URLs in a single integration-API value can otherwise be imported as one file.
 const formsHost = "https://forms.hsforms.com";
 
+function regionalFormsHost(hublet) {
+  if (!/^(na|eu|ap)\d{1,2}$/.test(hublet)) return null;
+  return hublet === "na1" ? formsHost : `https://forms-${hublet}.hsforms.com`;
+}
+
 function submissionResult(text) {
   try { return JSON.parse(text); } catch { /* The native iframe endpoint may return HTML. */ }
   // Read the JSON object in its postMessage script without executing any code.
@@ -35,6 +40,10 @@ export async function sendHubspotMultiplePhotos(payload, images, fields, fetcher
   const { portalID, hubspotFormID, hubspotFileField } = payload;
   const definitionResponse = await fetcher(`${formsHost}/embed/v4/render-definition/${portalID}/${hubspotFormID}`);
   if (!definitionResponse.ok) throw new Error("HubSpot could not load the photo upload settings. Please try again.");
+  // The global definition endpoint can serve any region, but uploads and
+  // submissions must go to the account's own Hublet (this account uses ap1).
+  let submissionHost = regionalFormsHost(definitionResponse.headers.get("x-origin-hublet") || process.env.HUBSPOT_REGION || "na1");
+  if (!submissionHost) throw new Error("HubSpot could not determine the photo upload region. Please try again.");
   const definition = await definitionResponse.json();
   const fileReference = `0-1/${hubspotFileField}`;
   const modules = [];
@@ -50,7 +59,19 @@ export async function sendHubspotMultiplePhotos(payload, images, fields, fetcher
 
   const upload = new FormData();
   for (const image of images) upload.append(fileReference, image, image.name);
-  const uploadResponse = await fetcher(`${formsHost}/submissions-files/v1/upload/files?formGuid=${hubspotFormID}&portalId=${portalID}&locale=en`, { method: "POST", body: upload });
+  const uploadPath = `/submissions-files/v1/upload/files?formGuid=${hubspotFormID}&portalId=${portalID}&locale=en`;
+  let uploadResponse = await fetcher(`${submissionHost}${uploadPath}`, { method: "POST", body: upload });
+  // A 488 explicitly rejects the request before accepting files. If a proxy
+  // removed the definition's region header, retry once at HubSpot's stated
+  // region; never retry an ambiguous failure or an accepted upload.
+  if (uploadResponse.status === 488) {
+    const routing = await uploadResponse.json().catch(() => ({}));
+    const correctedHost = regionalFormsHost(routing.correctHublet || "");
+    if (correctedHost && correctedHost !== submissionHost) {
+      submissionHost = correctedHost;
+      uploadResponse = await fetcher(`${submissionHost}${uploadPath}`, { method: "POST", body: upload });
+    }
+  }
   if (uploadResponse.status !== 202) throw new Error("HubSpot could not receive all your photos. Please try again.");
   const { uploadGuid } = await uploadResponse.json();
   if (typeof uploadGuid !== "string" || !/^[a-f\d]{8}(?:-[a-f\d]{4}){3}-[a-f\d]{12}$/i.test(uploadGuid)) {
@@ -73,7 +94,7 @@ export async function sendHubspotMultiplePhotos(payload, images, fields, fetcher
     fieldValues, renderedFieldsIds: Object.keys(fieldValues), shortenedFieldsIds: [],
     boolCheckBoxFields: "", emailResubscribeStatus: "NOT_APPLICABLE", captchaStatus: "NOT_APPLICABLE",
   }));
-  const response = await fetcher(`${formsHost}/submissions/v3/public/submit/formsnext/multipart/${portalID}/${hubspotFormID}`, { method: "POST", body });
+  const response = await fetcher(`${submissionHost}/submissions/v3/public/submit/formsnext/multipart/${portalID}/${hubspotFormID}`, { method: "POST", body });
   const result = response.ok ? submissionResult(await response.text()) : null;
   if (result?.accepted !== true || result.formGuid !== hubspotFormID) {
     throw new Error("HubSpot could not confirm your quote and photos. Please try again.");

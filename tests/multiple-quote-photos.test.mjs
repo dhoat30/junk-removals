@@ -71,14 +71,15 @@ const definition = { form: { lastUpdatedAt: 12345, modules: [{ type: 'step', mod
 
 test('HubSpot receives ten files together and submits their confirmed upload GUID with the quote', async () => {
   process.env.HUBSPOT_API_KEY = 'fake-token';
-  for (const html of [false, true]) {
+  for (const [html, hublet] of [[false, 'ap1'], [true, 'ap1'], [false, 'eu1'], [false, 'na1']]) {
     let calls = 0;
     await sendHubspotSubmission(payload, photos, async (url, options) => {
       calls++;
       if (calls === 1) {
         assert.match(url, /embed\/v4\/render-definition/);
-        return Response.json(definition);
+        return Response.json(definition, { headers: { "x-origin-hublet": hublet } });
       }
+      assert.equal(new URL(url).origin, hublet === "na1" ? "https://forms.hsforms.com" : `https://forms-${hublet}.hsforms.com`);
       assert.equal(options.headers, undefined);
       if (calls === 2) {
         assert.match(url, /submissions-files\/v1\/upload\/files/);
@@ -121,6 +122,37 @@ test('HubSpot stops on configuration, upload and form rejection instead of confi
       return Response.json({ accepted: false, formGuid: payload.hubspotFormID });
     }), /HubSpot/);
     assert.equal(calls, ['definition', 'single'].includes(failure) ? 1 : ['upload', 'guid'].includes(failure) ? 2 : 3);
+  }
+});
+
+test('a wrong-region rejection retries once at HubSpot’s correct region, then submits there', async () => {
+  process.env.HUBSPOT_API_KEY = 'fake-token';
+  const urls = [];
+  const sentImages = [];
+  await sendHubspotSubmission(payload, photos, async (url, options) => {
+    urls.push(url);
+    if (urls.length === 1) return Response.json(definition);
+    if (urls.length <= 3) sentImages.push(options.body.getAll('0-1/junk_photo').map(file => file.name));
+    if (urls.length === 2) return Response.json({ correctHublet: 'ap1' }, { status: 488 });
+    assert.equal(new URL(url).origin, 'https://forms-ap1.hsforms.com');
+    if (urls.length === 3) return Response.json({ uploadGuid }, { status: 202 });
+    return Response.json({ accepted: true, formGuid: payload.hubspotFormID });
+  });
+  assert.equal(urls.length, 4);
+  assert.deepEqual(sentImages[0], photos.map(file => file.name));
+  assert.deepEqual(sentImages[1], sentImages[0]);
+});
+
+test('wrong-region recovery is bounded and refuses invalid region values', async () => {
+  process.env.HUBSPOT_API_KEY = 'fake-token';
+  for (const correctHublet of ['evil.example/anything', 'ap1', 'na1', undefined]) {
+    let calls = 0;
+    await assert.rejects(sendHubspotSubmission(payload, photos, async () => {
+      calls++;
+      if (calls === 1) return Response.json(definition);
+      return Response.json({ correctHublet }, { status: 488 });
+    }), /could not receive all your photos/);
+    assert.equal(calls, correctHublet === 'ap1' ? 3 : 2);
   }
 });
 
