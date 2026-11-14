@@ -2,6 +2,7 @@ import sharp from "sharp";
 import { sendHubspotMultiplePhotos } from "./hubspotMultiplePhotos.mjs";
 import { randomUUID } from "node:crypto";
 import { quoteImagesError } from "../quoteImage.mjs";
+import { getEmailConfiguration, validEmail } from "./emailConfig.mjs";
 
 export class SubmissionError extends Error {
   constructor(message, status = 400) {
@@ -168,16 +169,17 @@ export async function sendHubspotSubmission(payload, image, fetcher = fetch) {
 
 export async function sendAdminEmail(payload, image, fetcher = fetch) {
   const images = imageList(image);
-  const domain = process.env.MAILGUN_DOMAIN;
-  const apiKey = process.env.MAILGUN_API_KEY;
-  const recipient = process.env.EMAIL_ADDRESS;
-  if (!domain || !apiKey || !recipient) throw new SubmissionError("Missing email configuration.", 503);
+  let configuration;
+  try { configuration = getEmailConfiguration(); }
+  catch (error) { throw new SubmissionError(error.message, 503); }
+  const { domain, apiKey, recipient, from } = configuration;
   const { email, message, formName } = payload;
-  if (typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || /[\r\n]/.test(email) || typeof message !== "string" || typeof formName !== "string") {
+  if (!validEmail(email) || typeof message !== "string" || typeof formName !== "string" || /[\r\n]/.test(formName)) {
     throw new SubmissionError("Invalid email submission.");
   }
   const body = new FormData();
-  body.append("from", email);
+  body.append("from", from);
+  body.append("h:Reply-To", email);
   body.append("to", recipient);
   body.append("subject", formName);
   body.append("text", `${message}${images.length === 1 ? "\n\nA photo of the items is attached." : images.length ? `\n\n${images.length} photos of the items are attached.` : ""}`);

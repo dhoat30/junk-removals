@@ -9,7 +9,9 @@ export async function submitQuote(endpoint, payload, image, fetcher = fetch) {
   const response = await fetcher(endpoint, { method: "POST", body });
   const result = await response.json().catch(() => ({}));
   if (!response.ok || result.success !== true) {
-    throw new Error(result.message || "Your quote request could not be sent. Please try again.");
+    const error = new Error(result.message || "Your quote request could not be sent. Please try again.");
+    if (typeof result.adminEmailReceipt === "string") error.adminEmailReceipt = result.adminEmailReceipt;
+    throw error;
   }
   if (images.length && result.imageReceived !== true) {
     throw new Error("Your photo was not confirmed. Please try again before leaving this page.");

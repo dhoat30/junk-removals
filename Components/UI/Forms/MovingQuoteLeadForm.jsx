@@ -200,17 +200,18 @@ export default function MovingQuoteLeadForm({
 
     const deliveryKey = JSON.stringify({ formData, clickIds, formName });
     if (deliveries.current?.key !== deliveryKey || deliveries.current?.images !== selectedImages) {
-      deliveries.current = { key: deliveryKey, images: selectedImages, hubspot: false, email: false };
+      deliveries.current = {
+        key: deliveryKey, images: selectedImages, hubspot: false, email: false,
+        submittedAt: dayjs().valueOf(),
+        transactionId: typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `lead-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      };
     }
     const currentDelivery = deliveries.current;
 
     const parts = formData.firstname.trim().split(/\s+/);
     const firstName = parts[0] || "";
-    const formattedDate = dayjs().valueOf();
-    const transactionId =
-      typeof crypto !== "undefined" && crypto.randomUUID
-        ? crypto.randomUUID()
-        : `lead-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const formattedDate = currentDelivery.submittedAt;
+    const transactionId = currentDelivery.transactionId;
 
     // The address is optional, so spell out the blank
     // rather than mailing through a row of empty labels.
@@ -261,7 +262,12 @@ Submitted: ${dayjs(formattedDate).format("DD/MM/YYYY HH:mm")}`;
       // that already accepted this unchanged request.
       const results = await Promise.allSettled([
         currentDelivery.hubspot ? Promise.resolve() : submitQuote("/api/submit-hubspot-form", dataPayload, selectedImages).then(() => { currentDelivery.hubspot = true; }),
-        currentDelivery.email ? Promise.resolve() : submitQuote("/api/sendmail", dataPayload, selectedImages).then(() => { currentDelivery.email = true; }),
+        currentDelivery.email ? Promise.resolve() : submitQuote("/api/sendmail", { ...dataPayload, adminEmailReceipt: currentDelivery.adminEmailReceipt }, selectedImages)
+          .then(() => { currentDelivery.email = true; })
+          .catch(error => {
+            if (error.adminEmailReceipt) currentDelivery.adminEmailReceipt = error.adminEmailReceipt;
+            throw error;
+          }),
       ]);
       const failed = results.find(result => result.status === "rejected");
       if (failed) throw failed.reason;
