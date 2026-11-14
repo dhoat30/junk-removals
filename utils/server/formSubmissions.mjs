@@ -1,6 +1,7 @@
 import sharp from "sharp";
+import { sendHubspotMultiplePhotos } from "./hubspotMultiplePhotos.mjs";
 import { randomUUID } from "node:crypto";
-import { quoteImageError } from "../quoteImage.mjs";
+import { quoteImagesError } from "../quoteImage.mjs";
 
 export class SubmissionError extends Error {
   constructor(message, status = 400) {
@@ -12,17 +13,15 @@ export class SubmissionError extends Error {
 export async function readSubmission(req) {
   // Leave room for multipart boundaries and the existing quote fields.
   if (Number(req.headers.get("content-length")) > 4 * 1024 * 1024) {
-    throw new SubmissionError("Please choose an image smaller than 3 MB.", 413);
+    throw new SubmissionError("The photos are too large together. Please remove some photos and try again.", 413);
   }
   let payload;
-  let image = null;
+  let images = [];
   try {
     if (req.headers.get("content-type")?.includes("multipart/form-data")) {
       const form = await req.formData();
       payload = JSON.parse(form.get("payload"));
-      const files = form.getAll("image");
-      if (files.length > 1) throw new SubmissionError("Please upload one image only.");
-      image = files[0] || null;
+      images = form.getAll("image");
     } else {
       payload = await req.json();
     }
@@ -33,13 +32,17 @@ export async function readSubmission(req) {
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
     throw new SubmissionError("Invalid form submission.");
   }
-  if (payload.hasImage && !image) {
+  if (payload.hasImage && !images.length) {
     throw new SubmissionError("The selected photo was missing from the request. Please choose it again and retry.");
   }
-  if (image) {
-    if (typeof image.arrayBuffer !== "function") throw new SubmissionError("Invalid image upload.");
-    const error = quoteImageError(image);
-    if (error) throw new SubmissionError(error);
+  if (payload.imageCount !== undefined && (!Number.isInteger(payload.imageCount) || payload.imageCount !== images.length)) {
+    throw new SubmissionError("Not all selected photos arrived. Please choose them again and retry.");
+  }
+  if (images.some(image => !image || typeof image.arrayBuffer !== "function")) throw new SubmissionError("Invalid image upload.");
+  const validationError = quoteImagesError(images);
+  if (validationError) throw new SubmissionError(validationError);
+  const validatedImages = [];
+  for (const image of images) {
     const bytes = Buffer.from(await image.arrayBuffer());
     try {
       // Decode the image as well as checking its declared MIME type.
@@ -49,15 +52,18 @@ export async function readSubmission(req) {
         throw new Error("Unsupported image");
       }
       await sharp(bytes, { limitInputPixels: 40000000 }).stats();
-      image = new File([bytes], `quote-photo-${randomUUID()}.${metadata.format === "jpeg" ? "jpg" : metadata.format}`, { type: image.type });
+      validatedImages.push(new File([bytes], `quote-photo-${randomUUID()}.${metadata.format === "jpeg" ? "jpg" : metadata.format}`, { type: image.type }));
     } catch {
       throw new SubmissionError("This image could not be read. Please choose another JPG, PNG or WebP photo.");
     }
   }
-  return { payload, image };
+  return { payload, images: validatedImages, image: validatedImages[0] || null };
 }
 
+const imageList = image => Array.isArray(image) ? image : image ? [image] : [];
+
 export async function sendHubspotSubmission(payload, image, fetcher = fetch) {
+  const images = imageList(image);
   const token = process.env.HUBSPOT_API_KEY;
   const { portalID, hubspotFormID } = payload;
   if (!token || !portalID || !hubspotFormID) {
@@ -69,7 +75,20 @@ export async function sendHubspotSubmission(payload, image, fetcher = fetch) {
   const headers = { Authorization: `Bearer ${token}` };
   const fields = payload.hubspotFormObject.filter(field => field?.name && field.value !== undefined && field.value !== null).map(field => ({ ...field }));
 
-  if (image) {
+  if (payload.hubspotFileField && !/^[a-z][a-z0-9_]*$/.test(payload.hubspotFileField)) {
+    throw new SubmissionError("Invalid HubSpot photo field.");
+  }
+  if (images.length > 1 && payload.hubspotFileField) {
+    try {
+      await sendHubspotMultiplePhotos(payload, images, fields, fetcher);
+    } catch (error) {
+      throw new SubmissionError(error.message || "HubSpot could not receive your photos. Please try again.", 502);
+    }
+    return;
+  }
+
+  const photoReferences = [];
+  for (const image of images) {
     const upload = new FormData();
     upload.append("file", image, image.name);
     upload.append("folderPath", "/quote-photos");
@@ -124,10 +143,15 @@ export async function sendHubspotSubmission(payload, image, fetcher = fetch) {
       if (photoField) photoField.value = signedUrl.href;
       else fields.push({ name: payload.hubspotFileField, value: signedUrl.href });
     } else {
-      const message = fields.find(field => field.name === "message");
-      if (message) message.value = `${message.value || ""}\n\n${photoDetails}`;
-      else fields.push({ name: "message", value: photoDetails });
+      photoReferences.push(photoDetails);
     }
+  }
+
+  if (photoReferences.length) {
+    const message = fields.find(field => field.name === "message");
+    const details = photoReferences.join("\n\n");
+    if (message) message.value = `${message.value || ""}\n\n${details}`;
+    else fields.push({ name: "message", value: details });
   }
 
   const response = await fetcher(`https://api.hsforms.com/submissions/v3/integration/secure/submit/${portalID}/${hubspotFormID}`, {
@@ -143,6 +167,7 @@ export async function sendHubspotSubmission(payload, image, fetcher = fetch) {
 }
 
 export async function sendAdminEmail(payload, image, fetcher = fetch) {
+  const images = imageList(image);
   const domain = process.env.MAILGUN_DOMAIN;
   const apiKey = process.env.MAILGUN_API_KEY;
   const recipient = process.env.EMAIL_ADDRESS;
@@ -155,8 +180,8 @@ export async function sendAdminEmail(payload, image, fetcher = fetch) {
   body.append("from", email);
   body.append("to", recipient);
   body.append("subject", formName);
-  body.append("text", `${message}${image ? "\n\nA photo of the items is attached." : ""}`);
-  if (image) body.append("attachment", image, image.name);
+  body.append("text", `${message}${images.length === 1 ? "\n\nA photo of the items is attached." : images.length ? `\n\n${images.length} photos of the items are attached.` : ""}`);
+  for (const image of images) body.append("attachment", image, image.name);
   const response = await fetcher(`https://api.mailgun.net/v3/${domain}/messages`, {
     method: "POST",
     headers: { Authorization: `Basic ${Buffer.from(`api:${apiKey}`).toString("base64")}` },

@@ -50,7 +50,7 @@ test("resizes phone photos and sends the prepared file to both APIs", async () =
       const { image } = await readSubmission(new Request(`https://example.com${url}`, options));
       assert.equal(image.type, "image/jpeg");
       assert.deepEqual(Buffer.from(await image.arrayBuffer()), Buffer.from(await prepared.arrayBuffer()));
-      return Response.json({ success: true, imageReceived: true });
+      return Response.json({ success: true, imageReceived: true, imageCount: 1 });
     });
   }
 });
@@ -88,7 +88,7 @@ test("HEIC and HEIF sources are converted even below the upload limit", async ()
       await submitQuote(endpoint, {}, prepared, async (url, options) => {
         const { image } = await readSubmission(new Request(`https://example.com${url}`, options));
         assert.equal(image.type, "image/jpeg");
-        return Response.json({ success: true, imageReceived: true });
+        return Response.json({ success: true, imageReceived: true, imageCount: 1 });
       });
     }
   }

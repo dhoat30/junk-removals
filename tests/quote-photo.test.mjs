@@ -59,12 +59,12 @@ test("rejects corrupt files and images with a spoofed MIME type", async () => {
   await assert.rejects(readSubmission(multipartRequest(new File([await photo.arrayBuffer()], "fake.jpg", { type: "image/jpeg" }))), /could not be read/);
 });
 
-test("rejects malformed payloads and multiple image uploads", async () => {
+test("rejects malformed payloads and more than ten image uploads", async () => {
   await assert.rejects(readSubmission(new Request("https://example.com", { method: "POST", body: "bad json" })), /Invalid form/);
   const body = new FormData();
   body.append("payload", JSON.stringify(payload));
-  body.append("image", photo); body.append("image", photo);
-  await assert.rejects(readSubmission(new Request("https://example.com", { method: "POST", body })), /one image/);
+  for (let i = 0; i < 11; i++) body.append("image", photo);
+  await assert.rejects(readSubmission(new Request("https://example.com", { method: "POST", body })), /up to 10 photos/);
 });
 
 test("HubSpot receives a PRIVATE upload and photo reference with all existing fields", async () => {
@@ -196,7 +196,7 @@ test("browser transport sends the selected photo intact to both API endpoints", 
     requests.push({ url, submission });
     assert.equal(submission.payload.hasImage, true);
     assert.deepEqual(Buffer.from(await submission.image.arrayBuffer()), Buffer.from(await photo.arrayBuffer()));
-    return ok({ success: true, imageReceived: true });
+    return ok({ success: true, imageReceived: true, imageCount: 1 });
   };
   await Promise.all([
     submitQuote("/api/submit-hubspot-form", payload, photo, fakeFetch),

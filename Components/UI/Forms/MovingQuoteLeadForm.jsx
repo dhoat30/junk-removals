@@ -11,8 +11,8 @@ import Typography from "@mui/material/Typography";
 import BoltIcon from "@mui/icons-material/Bolt";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternateOutlined";
-import { quoteImageError, QUOTE_IMAGE_SOURCE_ACCEPT } from "@/utils/quoteImage.mjs";
-import { prepareQuoteImage } from "@/utils/prepareQuoteImage.mjs";
+import { quoteImagesError, MAX_QUOTE_IMAGES, QUOTE_IMAGE_SOURCE_ACCEPT } from "@/utils/quoteImage.mjs";
+import { prepareQuoteImages } from "@/utils/prepareQuoteImage.mjs";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Input from "./InputFields/Input";
 import GoogleAutocomplete from "@/Components/GoogleMaps/GoogleAutoComplete";
@@ -99,50 +99,40 @@ export default function MovingQuoteLeadForm({
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
   const [errors, setErrors] = useState({});
   const [error, setError] = useState("");
-  const [image, setImage] = useState(null);
+  const [images, setImages] = useState([]);
   const [imageError, setImageError] = useState("");
-  const [imagePreview, setImagePreview] = useState("");
+  const [imagePreviews, setImagePreviews] = useState([]);
   const [isPreparingImage, setIsPreparingImage] = useState(false);
   const imageInput = useRef(null);
-  const imageSelection = useRef(0);
   const deliveries = useRef(null);
 
   useEffect(() => {
-    if (!image) {
-      setImagePreview("");
-      return;
-    }
-    const url = URL.createObjectURL(image);
-    setImagePreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [image]);
+    const urls = images.map(image => URL.createObjectURL(image));
+    setImagePreviews(urls);
+    return () => urls.forEach(url => URL.revokeObjectURL(url));
+  }, [images]);
 
   const handleImageChange = async (event) => {
-    const file = event.target.files?.[0] || null;
-    const input = event.target;
-    const selection = ++imageSelection.current;
+    const files = Array.from(event.target.files || []);
+    event.target.value = "";
+    if (!files.length) return;
     setImageError("");
-    setImage(null);
     setIsPreparingImage(true);
     try {
-      const prepared = await prepareQuoteImage(file);
-      if (selection === imageSelection.current) setImage(prepared);
+      // Adding photos keeps existing selections. Recompress them if the set
+      // needs a smaller per-photo budget, without decoding HEIC again.
+      const prepared = await prepareQuoteImages([...images, ...files]);
+      setImages(prepared);
     } catch (error) {
-      if (selection === imageSelection.current) {
-        setImageError(error.message || "Your photo could not be resized. Please choose another photo.");
-        input.value = "";
-      }
+      setImageError(error.message || "Your photos could not be prepared. Please choose them again.");
     } finally {
-      if (selection === imageSelection.current) setIsPreparingImage(false);
+      setIsPreparingImage(false);
     }
   };
 
-  const removeImage = () => {
-    imageSelection.current++;
-    setIsPreparingImage(false);
-    setImage(null);
+  const removeImage = (index) => {
+    setImages(previous => previous.filter((_, imageIndex) => imageIndex !== index));
     setImageError("");
-    if (imageInput.current) imageInput.current.value = "";
   };
   const [isLoading, setIsLoading] = useState(false);
   const [googleAdsAddress, setGoogleAdsAddress] = useState(INITIAL_GOOGLE_ADDRESS);
@@ -201,17 +191,16 @@ export default function MovingQuoteLeadForm({
     event.preventDefault();
 
     if (isPreparingImage) return;
-    // Use the prepared photo, not the full-size original in the file input.
-    const selectedImage = image;
-    const selectedImageError = quoteImageError(selectedImage);
+    const selectedImages = images;
+    const selectedImageError = quoteImagesError(selectedImages);
     if (!validateForm() || imageError || selectedImageError) {
       if (selectedImageError) setImageError(selectedImageError);
       return;
     }
 
     const deliveryKey = JSON.stringify({ formData, clickIds, formName });
-    if (deliveries.current?.key !== deliveryKey || deliveries.current?.image !== selectedImage) {
-      deliveries.current = { key: deliveryKey, image: selectedImage, hubspot: false, email: false };
+    if (deliveries.current?.key !== deliveryKey || deliveries.current?.images !== selectedImages) {
+      deliveries.current = { key: deliveryKey, images: selectedImages, hubspot: false, email: false };
     }
     const currentDelivery = deliveries.current;
 
@@ -223,7 +212,7 @@ export default function MovingQuoteLeadForm({
         ? crypto.randomUUID()
         : `lead-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-    // Everything but name and email is optional, so spell out the blanks
+    // The address is optional, so spell out the blank
     // rather than mailing through a row of empty labels.
     const orBlank = (value) =>
       typeof value === "string" && value.trim() ? value.trim() : "Not provided";
@@ -271,8 +260,8 @@ Submitted: ${dayjs(formattedDate).format("DD/MM/YYYY HH:mm")}`;
       // Retrying after one provider failed must not resend to the provider
       // that already accepted this unchanged request.
       const results = await Promise.allSettled([
-        currentDelivery.hubspot ? Promise.resolve() : submitQuote("/api/submit-hubspot-form", dataPayload, selectedImage).then(() => { currentDelivery.hubspot = true; }),
-        currentDelivery.email ? Promise.resolve() : submitQuote("/api/sendmail", dataPayload, selectedImage).then(() => { currentDelivery.email = true; }),
+        currentDelivery.hubspot ? Promise.resolve() : submitQuote("/api/submit-hubspot-form", dataPayload, selectedImages).then(() => { currentDelivery.hubspot = true; }),
+        currentDelivery.email ? Promise.resolve() : submitQuote("/api/sendmail", dataPayload, selectedImages).then(() => { currentDelivery.email = true; }),
       ]);
       const failed = results.find(result => result.status === "rejected");
       if (failed) throw failed.reason;
@@ -386,42 +375,50 @@ Submitted: ${dayjs(formattedDate).format("DD/MM/YYYY HH:mm")}`;
 
         <Box className={styles.imageUpload}>
           <Typography component="p" className={styles.uploadTitle}>
-            Photo of your items <span>(optional)</span>
+            Photos of your items <span>(optional)</span>
           </Typography>
           <Typography component="p" id="quote-photo-help" className={styles.uploadHelp}>
-            Show us what needs to go for a more accurate quote. JPG, PNG, WebP or HEIC, up to 20 MB. iPhone HEIC photos are converted automatically, and larger photos are resized.
+            Add up to 10 photos for a more accurate quote. JPG, PNG, WebP or HEIC, up to 20 MB each. Photos are automatically converted and resized for upload.
           </Typography>
           <label className={styles.uploadPicker}>
             <input
               ref={imageInput}
               type="file"
               name="image"
+              multiple
               accept={QUOTE_IMAGE_SOURCE_ACCEPT}
               onChange={handleImageChange}
-              disabled={isLoading}
-              aria-label={image ? "Change photo of your items" : "Upload a photo of your items"}
+              disabled={isLoading || isPreparingImage || images.length >= MAX_QUOTE_IMAGES}
+              aria-label="Add photos of your items"
               aria-describedby={`quote-photo-help${imageError ? " quote-photo-error" : ""}`}
               aria-invalid={Boolean(imageError)}
               className={styles.uploadInput}
             />
             <AddPhotoAlternateOutlinedIcon aria-hidden="true" />
-            <span>{isPreparingImage ? "Preparing photo…" : image ? "Change photo" : "Choose a photo"}</span>
+            <span>{isPreparingImage ? "Preparing photos…" : images.length >= MAX_QUOTE_IMAGES ? "10 photos selected" : images.length ? "Add more photos" : "Choose photos"}</span>
           </label>
-          {isPreparingImage ? <p role="status">Preparing your photo for upload…</p> : null}
-          {image ? (
-            <Box className={styles.uploadSelection}>
-              {imagePreview ? (
-                // A local blob preview never leaves the browser before submission.
+          <p className={styles.uploadHelp} aria-live="polite">{images.length} of {MAX_QUOTE_IMAGES} photos selected</p>
+          {isPreparingImage ? <p role="status">Preparing your photos for upload…</p> : null}
+          {images.map((image, index) => (
+            <Box className={styles.uploadSelection} key={index}>
+              {imagePreviews[index] ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={imagePreview} alt="Selected items for removal" className={styles.uploadPreview} />
+                <img src={imagePreviews[index]} alt={`Selected items for removal, photo ${index + 1}`} className={styles.uploadPreview} />
               ) : null}
               <span className={styles.uploadFilename}>{image.name}</span>
-              <button type="button" onClick={removeImage} disabled={isLoading} className={styles.removeImage}>
+              <button type="button" onClick={() => removeImage(index)} disabled={isLoading || isPreparingImage} aria-label={`Remove photo ${index + 1}: ${image.name}`} className={styles.removeImage}>
                 Remove
               </button>
             </Box>
+          ))}
+          {imageError ? (
+            <>
+              <p id="quote-photo-error" role="alert" className={styles.uploadError}>{imageError}</p>
+              <button type="button" onClick={() => setImageError("")} className={styles.removeImage}>
+                {images.length ? "Keep current photos" : "Continue without photos"}
+              </button>
+            </>
           ) : null}
-          {imageError ? <p id="quote-photo-error" role="alert" className={styles.uploadError}>{imageError}</p> : null}
         </Box>
 
         <Button

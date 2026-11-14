@@ -5,9 +5,9 @@ export const runtime = "nodejs";
 
 export async function POST(req) {
   try {
-    const { payload, image } = await readSubmission(req);
-    await sendAdminEmail(payload, image);
-    return NextResponse.json({ message: "Email sent", success: true, imageReceived: Boolean(image) });
+    const { payload, images } = await readSubmission(req);
+    await sendAdminEmail(payload, images);
+    return NextResponse.json({ message: "Email sent", success: true, imageReceived: images.length > 0, imageCount: images.length });
   } catch (error) {
     return NextResponse.json({ message: error instanceof SubmissionError ? error.message : "Unable to send the email. Please try again.", success: false }, { status: error instanceof SubmissionError ? error.status : 500 });
   }
