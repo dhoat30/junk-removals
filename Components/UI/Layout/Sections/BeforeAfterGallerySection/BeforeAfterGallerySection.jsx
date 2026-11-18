@@ -10,7 +10,7 @@ import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
 import BeforeAfterMasonry from "@/Components/UI/BeforeAfterSlider/BeforeAfterMasonry";
 import styles from "./BeforeAfterGallerySection.module.scss";
 
-export default function BeforeAfterGallerySection({ title, description, images }) {
+export default function BeforeAfterGallerySection({ title, description, images, featuredComparisons = false }) {
   const [activeIndex, setActiveIndex] = useState(null);
   const [activeMedia, setActiveMedia] = useState("image");
   const [videoError, setVideoError] = useState(false);
@@ -76,7 +76,7 @@ export default function BeforeAfterGallerySection({ title, description, images }
           />
         </div>
 
-        <div className={styles.grid}>
+        <div className={`${styles.grid} ${featuredComparisons ? styles.featuredGrid : ""}`}>
           {galleryItems.map((item, index) => {
             const media = (
               <div

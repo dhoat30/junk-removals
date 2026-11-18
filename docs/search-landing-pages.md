@@ -78,3 +78,7 @@ The changes are local to this repository and have not been deployed. Run `npm ru
 | [Junk Busters](https://www.junkbusters.co.nz/) | Two-seater couch: NZ$120; top-loading washer: NZ$50; dryer: NZ$30 | Not stated on the cited page |
 
 These references record the original research behind the owner-approved indicative guide. They are internal documentation and are not rendered on the landing pages. Keep the guide conditional on the job scope and confirm the final total, including any applicable GST, in the quote. A different Clean Sweep-branded domain appeared in search snippets with separate mattress/fridge rates, but its opened pricing page did not show those figures; those unverified amounts were excluded.
+
+## Owner photo gallery
+
+The shared gallery uses the owner’s two numbered before/after pairs and seven collection photos from `public/images`. Optimised, auto-oriented WebP copies live in `public/gallery` (11 images, around 3.5 MB total); source JPEGs are retained. `utils/removalGallery.mjs` supplies the image pairs, dimensions and alt text. The section appears on all four service landing pages, the homepage and the dedicated quote page. On the homepage it fills the gallery block or inserts one after the service cards. Two featured comparisons support dragging, touch and keyboard arrows; the remaining photos open in the existing enlarged photo viewer.

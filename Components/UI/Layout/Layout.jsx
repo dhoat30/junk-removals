@@ -154,6 +154,7 @@ export default function Layout({
           title={section.title}
           description={section.description}
           images={section.images}
+          featuredComparisons={section.featuredComparisons}
         />
       );
     }

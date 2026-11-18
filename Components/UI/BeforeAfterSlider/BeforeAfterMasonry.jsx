@@ -20,6 +20,7 @@ export default function BeforeAfterMasonry({ data, priority }) {
               <Image
                 src={data.beforeImage.url}
                 alt={data.beforeImage.alt ? data.beforeImage.alt : "Before"}
+                sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw"
                 priority={priority}
                 fill
               />
@@ -28,6 +29,7 @@ export default function BeforeAfterMasonry({ data, priority }) {
               <Image
                 src={data.afterImage.url}
                 alt={data.afterImage.alt ? data.afterImage.alt : "After"}
+                sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw"
                 fill
                 priority={priority}
               />
@@ -47,6 +49,7 @@ export default function BeforeAfterMasonry({ data, priority }) {
           <Image
             src={data.beforeImage.url}
             alt={data.beforeImage.alt ? data.beforeImage.alt : "Completed work"}
+            sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw"
             fill
             priority={priority}
           />

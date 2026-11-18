@@ -9,6 +9,7 @@ import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "@/utils/siteMetadata";
 import { DEFAULT_AREAS_COVERED_SECTION } from "@/utils/aucklandCoverage";
 import { DEFAULT_SERVICE_CARDS_SECTION } from "@/utils/junkRemovalServices";
 import reviewsData from "@/data/google-reviews.json";
+import { DEFAULT_REMOVAL_GALLERY_SECTION } from "@/utils/removalGallery.mjs";
 
 
 
@@ -43,6 +44,9 @@ export const metadata = {
         const servicesIndex = sections.findIndex((section) => section.acf_fc_layout === "service_cards")
         sections.splice(servicesIndex + 1, 0, DEFAULT_AREAS_COVERED_SECTION)
     }
+    const galleryIndex = sections.findIndex(section => section.acf_fc_layout === "before_after_gallery")
+    if (galleryIndex >= 0) sections[galleryIndex] = DEFAULT_REMOVAL_GALLERY_SECTION
+    else sections.splice(sections.findIndex(section => section.acf_fc_layout === "service_cards") + 1, 0, DEFAULT_REMOVAL_GALLERY_SECTION)
     return (
         <>
             <Header />

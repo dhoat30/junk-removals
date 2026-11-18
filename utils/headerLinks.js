@@ -11,5 +11,9 @@ export const headerLinks = [
       { label: "Removal costs & pricing", url: "/rubbish-removal-cost-auckland", subtitle: "Plan your collection and get a quote" },
     ],
   },
+      { label: "Areas We Cover", url: "#areas-covered" },
+
+    { label: "Gallery", url: "#before-after-gallery" },
+
   { label: "Contact Us", url: "/#contact" },
 ];

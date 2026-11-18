@@ -9,6 +9,8 @@ import FaqAccordionSection from "@/Components/UI/Layout/Sections/FaqAccordionSec
 import FooterCta from "@/Components/UI/CTA/FooterCta";
 import { SITE_NAME, SITE_URL } from "@/utils/siteMetadata";
 import { REMOVAL_PRICE_GUIDES } from "@/utils/removalPriceGuide.mjs";
+import BeforeAfterGallerySection from "@/Components/UI/Layout/Sections/BeforeAfterGallerySection/BeforeAfterGallerySection";
+import { DEFAULT_REMOVAL_GALLERY_SECTION } from "@/utils/removalGallery.mjs";
 
 export default function ServiceLandingPage({ page, slug }) {
   const phone = process.env.NEXT_PUBLIC_PHONE_NUMBER;
@@ -31,6 +33,7 @@ export default function ServiceLandingPage({ page, slug }) {
         <LandingPageHeroSection title={page.headline} description={page.intro} aboveTitleUsp="Locally owned. Auckland-wide."
           uspData={{ text_usp: page.benefits.map(value => ({ value })) }} image={page.image} formName={page.formName} />
         <ServiceCardsSection title={page.servicesTitle} description={page.servicesDescription} cards={page.cards} quoteHref="#get-free-quote" columns={3} />
+        <BeforeAfterGallerySection {...DEFAULT_REMOVAL_GALLERY_SECTION} />
         {page.adGroup === "Cost & Waste" ? <>{pricing}{information}</> : <>{information}{pricing}</>}
         <RegularProcess title={`<h2>${page.processTitle}</h2>`} cards={page.processCards} ctaArray={[{ link: { url: "#get-free-quote", title: "Get my free quote" } }]} />
         <AreasCoveredSection title={`${page.adGroup === "Furniture & Couch" ? "Furniture collection" : page.adGroup === "Rubbish Removal" ? "Rubbish removal" : "Junk and rubbish pickups"} across Auckland`}

@@ -5,6 +5,8 @@ import MovingQuoteLeadForm from "@/Components/UI/Forms/MovingQuoteLeadForm";
 import HeroUSPBox from "@/Components/UI/USP/HeroUSPBox";
 import GoogleReviewSnippet from "@/Components/UI/GoogleReviews/GoogleReviewCard/GoogleReviewSnippet";
 import styles from "./GetFreeMovingQuotePage.module.scss";
+import BeforeAfterGallerySection from "@/Components/UI/Layout/Sections/BeforeAfterGallerySection/BeforeAfterGallerySection";
+import { DEFAULT_REMOVAL_GALLERY_SECTION } from "@/utils/removalGallery.mjs";
 
 export default function GetFreeMovingQuotePage({ heroContent, reviewerPics }) {
   const title = heroContent?.title;
@@ -92,6 +94,7 @@ export default function GetFreeMovingQuotePage({ heroContent, reviewerPics }) {
           </div>
         </Container>
       </section>
+      <BeforeAfterGallerySection {...DEFAULT_REMOVAL_GALLERY_SECTION} />
     </div>
   );
 }
