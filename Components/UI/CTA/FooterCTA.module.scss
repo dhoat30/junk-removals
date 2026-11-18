@@ -1,49 +1,107 @@
-.section{ 
-  padding: 40px 0;
-  @media (max-width: 900px) {
-    padding: 24px 0;
-  }
-  .wrapper{ 
-    padding: 120px 0;
-    background:
-      radial-gradient(circle at 18% 24%, rgba(var(--brand-accent-rgb), 0.18), transparent 28%),
-      linear-gradient(135deg, var(--light-primary) 0%, var(--light-primary-container) 52%, var(--light-secondary) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 32px;
-    box-shadow: 0 24px 60px rgba(var(--brand-red-rgb), 0.16);
+.section {
+  padding: 40px 0 56px;
+}
 
-    @media (max-width: 900px) {
-      padding: 56px 16px;
-    }
-
-    .contentWrapper{ 
-      max-width: 800px;
-      margin: 0 auto;
-    }
-    
+.wrapper {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  gap: 64px;
+  align-items: center;
+  overflow: hidden;
+  padding: 56px 64px;
+  background: var(--brand-charcoal);
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 24px;
+  &::before {
+    content: "";
+    position: absolute;
+    top: 40px;
+    bottom: 40px;
+    left: 0;
+    width: 5px;
+    border-radius: 0 4px 4px 0;
+    background: var(--brand-red);
   }
 }
 
-.quoteButton :global(.MuiButton-root) {
-  background: #fff !important;
-  color: var(--light-primary) !important;
-  border-radius: 999px !important;
-  font-weight: 800 !important;
-  padding-inline: 24px !important;
-
-  &:hover {
-    background: var(--brand-mist) !important;
-  }
+.contentWrapper { min-width: 0; }
+.eyebrow {
+  margin: 0 0 16px;
+  color: #fff;
+  opacity: .65;
+  font-size: .76rem;
+  line-height: 1.5;
+  font-weight: 650;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.title:global(.MuiTypography-root) {
+  max-width: 750px;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(2rem, 3vw, 2.8rem);
+  line-height: 1.12;
+  font-weight: 800;
+  letter-spacing: -.04em;
+}
+.description:global(.MuiTypography-root) {
+  max-width: 640px;
+  margin: 18px 0 0;
+  color: rgba(255, 255, 255, .78);
+  font-size: 1rem;
+  line-height: 1.75;
+  p { margin: 0; }
+}
+.reassurance {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-top: 24px;
+  color: rgba(255, 255, 255, .85);
+  font-size: .85rem;
+  span { display: inline-flex; align-items: center; gap: 6px; }
+  svg { width: 17px; height: 17px; color: #ff8f88; }
+}
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.quoteButton:global(.MuiButton-root), .secondaryButton:global(.MuiButton-root) {
+  width: 100%;
+  min-height: 54px;
+  padding: 14px 22px;
+  border-radius: 12px;
+  font-size: .98rem;
+  line-height: 1.5;
+  font-weight: 650;
+  text-transform: none;
+  box-shadow: none;
+  &:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+}
+.quoteButton:global(.MuiButton-root) {
+  background: var(--brand-red);
+  color: #fff;
+  &:hover { background: #bf0000; box-shadow: none; }
+}
+.secondaryButton:global(.MuiButton-root) {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, .35);
+  &:hover { background: rgba(255,255,255,.06); border-color: #fff; }
 }
 
-.phoneButton :global(.MuiButton-root) {
-  border-color: rgba(255, 255, 255, 0.8) !important;
-  color: #fff !important;
-  border-radius: 999px !important;
-  padding-inline: 24px !important;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.08) !important;
-    border-color: #fff !important;
-  }
+@media (max-width: 1000px) {
+  .wrapper { padding: 40px; gap: 32px; grid-template-columns: minmax(0, 1fr) 280px; }
+}
+@media (max-width: 700px) {
+  .section { padding: 24px 0 40px; }
+  .wrapper { grid-template-columns: minmax(0, 1fr); padding: 32px 24px; gap: 28px; border-radius: 20px; }
+  .wrapper::before { top: 32px; bottom: 32px; width: 4px; }
+  .eyebrow { font-size: .68rem; margin-bottom: 14px; }
+  .title:global(.MuiTypography-root) { font-size: 2rem; }
+  .description:global(.MuiTypography-root) { font-size: .95rem; margin-top: 16px; }
+  .reassurance { margin-top: 20px; gap: 12px 20px; font-size: .8rem; }
+  .quoteButton:global(.MuiButton-root), .secondaryButton:global(.MuiButton-root) { padding-inline: 12px; font-size: .94rem; }
 }

@@ -69,6 +69,7 @@ const INITIAL_FORM_DATA = {
   email: "",
   phone: "",
   address: "",
+  message: "",
 };
 
 const INITIAL_GOOGLE_ADDRESS = {
@@ -223,6 +224,7 @@ export default function MovingQuoteLeadForm({
 Email: ${formData.email}
 Phone Number: ${orBlank(formData.phone)}
 Property Address: ${orBlank(formData.address)}
+Message: ${orBlank(formData.message)}
 Submitted: ${dayjs(formattedDate).format("DD/MM/YYYY HH:mm")}`;
 
     const dataPayload = {
@@ -237,6 +239,7 @@ Submitted: ${dayjs(formattedDate).format("DD/MM/YYYY HH:mm")}`;
         { name: "email", value: formData.email },
         { name: "phone", value: formData.phone },
         { name: "property_address", value: formData.address },
+        { name: "message", value: formData.message.trim() },
       ],
     };
 
@@ -285,6 +288,8 @@ Submitted: ${dayjs(formattedDate).format("DD/MM/YYYY HH:mm")}`;
           currency: "NZD",
           clickIds,
           formData: {
+            enquiryType: formName,
+            landingPage: window.location.pathname,
             firstName,
             email: formData.email,
             phone: formData.phone,
@@ -377,6 +382,17 @@ Submitted: ${dayjs(formattedDate).format("DD/MM/YYYY HH:mm")}`;
           autoComplete="street-address"
           error={errors.address}
           helperText="Please enter a valid address"
+        />
+
+        <Input
+          id="message"
+          label="Message (optional)"
+          type="textarea"
+          value={formData.message}
+          onChange={(value) => handleChange("message", value)}
+          required={false}
+          minRows={3}
+          placeholder="Tell us what needs to go, your preferred pickup date or any access details."
         />
 
         <Box className={styles.imageUpload}>

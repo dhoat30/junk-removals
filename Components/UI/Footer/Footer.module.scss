@@ -68,6 +68,15 @@
   }
 }
 
+.serviceLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 28px;
+  padding: 28px 0;
+  a { color: var(--brand-charcoal); font-size: .9rem; text-decoration: underline; text-underline-offset: 4px; }
+  a:hover { color: var(--light-primary); }
+}
+
 .contactInfoWrapper {
   gap: 10px !important;
 

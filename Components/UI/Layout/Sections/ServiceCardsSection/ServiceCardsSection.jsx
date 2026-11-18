@@ -29,6 +29,7 @@ export default function ServiceCardsSection({
   description,
   cards = JUNK_REMOVAL_SERVICE_CARDS,
   quoteHref = "/#get-free-quote",
+  columns = 4,
 }) {
   if (!cards?.length) return null;
 
@@ -46,11 +47,11 @@ export default function ServiceCardsSection({
           ) : null}
         </div>
 
-        <div className={styles.grid}>
+        <div className={`${styles.grid} ${columns === 3 ? styles.threeColumns : ""}`}>
           {cards.map((card) => {
             const Icon = SERVICE_ICONS[card.icon] || HomeOutlinedIcon;
             return (
-              <article key={card.title} className={styles.card}>
+              <article id={card.id} key={card.title} className={styles.card}>
                 <div className={styles.iconWrapper} aria-hidden="true">
                   <Icon />
                 </div>

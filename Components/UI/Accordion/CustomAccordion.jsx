@@ -41,8 +41,10 @@ background: "var(--light-surface-container-lowest)",
   borderTop: "1px solid rgba(0, 0, 0, .125)",
 }));
 
-export default function CustomAccordion({ qaData, className }) {
-  const [expanded, setExpanded] = React.useState(false);
+export default function CustomAccordion({ qaData, className = "", variant = "default", defaultExpanded = false }) {
+  const [expanded, setExpanded] = React.useState(defaultExpanded ? "panel0" : false);
+  const accordionId = React.useId();
+  const isFaq = variant === "faq";
 
   if (!qaData) return null;
 
@@ -54,23 +56,22 @@ export default function CustomAccordion({ qaData, className }) {
     const accordionPanel = `panel${index}`; // Ensure unique panel ID for each accordion
     return (
       <Accordion
-      className={`${className}`}
+      className={`${className} ${isFaq ? styles.faqItem : ""}`}
         key={index}
         expanded={expanded === accordionPanel} // Expanded if the panel is the same as the current state
         onChange={handleChange(accordionPanel)} // Handle panel change
-        sx={{
-          background: "background: var(--light-surface-container-low)",
-        }}
       >
         <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls={`panel${index}a-content`}
-          id={`panel${index}a-header`}
-          sx={{background: "var(--light-surface-container-low)"}}
+          className={isFaq ? styles.faqSummary : undefined}
+          expandIcon={isFaq ? <span className={styles.faqToggle} aria-hidden="true" /> : <ExpandMoreIcon />}
+          aria-controls={`${accordionId}-panel${index}-content`}
+          id={`${accordionId}-panel${index}-header`}
+          sx={isFaq ? undefined : {background: "var(--light-surface-container-low)"}}
         >
-          <Typography variant="subtitle1">{item.question}</Typography>
+          {isFaq ? <span className={styles.faqNumber} aria-hidden="true">{String(index + 1).padStart(2, "0")}</span> : null}
+          <Typography variant="subtitle1" component={isFaq ? "h3" : "span"} className={isFaq ? styles.faqQuestion : undefined}>{item.question}</Typography>
         </AccordionSummary>
-        <AccordionDetails className={`${styles.details}`}>
+        <AccordionDetails className={isFaq ? styles.faqDetails : styles.details}>
         <div
               className={`${styles.answer} body1`}
               dangerouslySetInnerHTML={{ __html: item.answer }}
@@ -80,6 +81,6 @@ export default function CustomAccordion({ qaData, className }) {
     );
   });
 
-  return <div>{faqList}</div>;
+  return <div className={isFaq ? styles.faqList : undefined}>{faqList}</div>;
 }
 

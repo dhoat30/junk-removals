@@ -1,0 +1,232 @@
+const card = (title, description, icon, id) => ({ title, description, icon, ...(id ? { id } : {}) });
+const question = (question, answer) => ({ question, answer: `<p>${answer}</p>` });
+const included = {
+  title: "Your quote includes",
+  items: ["Collection team and vehicle", "Labour and loading", "Transport and tip fees", "The price agreed before work starts"],
+  note: "Show us the whole job, including access, so we can quote for the work you need.",
+};
+const sourceImage = { url: "/landing-pages/removal-professional.webp", alt: "Junk Removals collection illustration", width: 1254, height: 1254 };
+
+export const SERVICE_LANDING_PAGES = {
+  "junk-removal-auckland": {
+    label: "Junk removal", adGroup: "Junk Removal",
+    title: "Junk Removal Auckland | Collection & Clear-outs | Junk Removals",
+    description: "Auckland junk removal for household clutter, furniture, appliances and property clear-outs. We do the lifting. Get a fixed quote including loading and tip fees.",
+    headline: "Junk removal Auckland. More space, less hassle.",
+    intro: "One unwanted item or a whole room to clear? We collect household junk, furniture, appliances and garden waste across Auckland. Send photos for a fixed price, with labour, loading and tip fees included.",
+    benefits: ["Single items through to full clear-outs", "We carry, load and take it away", "Same-day and next-day slots, subject to availability", "A fixed price before work starts"],
+    formName: "Auckland Junk Removal Enquiry",
+    image: sourceImage,
+    servicesTitle: "What do you need gone?",
+    servicesDescription: "You can include different types of junk in one enquiry. Show us everything you want collected so we can plan the right pickup.",
+    cards: [
+      card("Household clutter", "Boxes, bags and unwanted everyday items from cupboards, spare rooms and storage spaces.", "household"),
+      card("Old furniture", "Couches, beds, tables and wardrobes. Tell us about stairs or tight doorways when you send your photos.", "furniture"),
+      card("Whiteware & appliances", "Fridges, washing machines, dryers and other unwanted appliances. Let us know what needs collecting.", "appliances"),
+      card("Garden waste", "Branches, clippings and bagged green waste. Include a photo of the pile and tell us how close we can park.", "garden"),
+      card("House & garage clear-outs", "Make room before a move, after a tenancy or when clearing a property. We can quote from your full list and photos.", "clearance"),
+      card("Small renovation loads", "Offcuts, packaging and other waste from small building jobs. Describe heavy materials separately.", "building"),
+    ],
+    information: {
+      eyebrow: "A collection that fits the job", title: "You point it out. We do the lifting.",
+      description: "A junk pickup should leave you with less to organise. Tell us what needs to go, where it is and when you would like it collected.",
+      rows: [
+        { title: "Inside, outside or in the garage", text: "Tell us where your items are. You do not have to move everything to the kerb just to ask for a quote; we plan the lifting and access with you." },
+        { title: "A single item is welcome", text: "You can request a pickup for just one couch, mattress or appliance. For a larger job, send photos of each room or pile you want included." },
+        { title: "A time that works for you", text: "Ask about same-day or next-day collection. Available slots depend on your suburb, the size of the job and the crew’s route." },
+      ],
+      aside: { title: "Help us plan your pickup", items: ["Up to 10 photos of the items", "Your Auckland suburb and address", "Any stairs, lifts or long carries", "Parking and your preferred collection time"], note: "Photos are optional. You can also call us to talk through the job." },
+    },
+    pricing: {
+      eyebrow: "Clear pricing", title: "One quote for the collection.",
+      description: "The cost of junk removal depends on the actual load and the work needed to collect it. A few clear photos help us give you a useful price before you commit.",
+      rows: [
+        { title: "How much there is", text: "One item, a mixed pile or a property clearance all need different amounts of vehicle space and loading time." },
+        { title: "What the items are", text: "The type and weight of the materials affect handling and disposal. Point out any especially heavy or unusual items." },
+        { title: "Where we collect from", text: "Include your suburb, parking access and any stairs or long walks between the items and the vehicle." },
+      ], aside: included,
+    },
+    processTitle: "Your junk pickup in 3 steps",
+    processCards: [
+      { title: "Show us the job", description: "<p>Add up to 10 photos to the form, or call us. Tell us your suburb and what needs collecting.</p>" },
+      { title: "Agree your quote", description: "<p>We review the items and access with you, confirm the price and arrange an available collection time.</p>" },
+      { title: "Get your space back", description: "<p>Our crew handles the lifting and loading. We look to reuse or recycle suitable items where we can.</p>" },
+    ],
+    faqs: [
+      question("Can you collect just one item?", "Yes. You can ask for a single-item junk pickup, including a couch, mattress or fridge. Send a photo and your suburb for a quote."),
+      question("Do I need to put my junk outside first?", "Tell us where the items are and what access is available. We do the lifting and loading, and will include the collection arrangements in your quote."),
+      question("Can you collect my junk today?", "Same-day and next-day slots may be available. Call us with your suburb and item list so we can check the current schedule."),
+      question("Can I include furniture and garden waste in the same pickup?", "Include both in your enquiry, with separate photos of each pile. We will confirm what can be collected together and the price for the full job."),
+      question("What happens to the items you collect?", "We look for opportunities to reuse, donate or recycle suitable items where possible. The options depend on the condition of the items and the facilities that can accept them."),
+      question("Are there items I should tell you about first?", "Please flag paint, chemicals, gas bottles, very heavy materials or suspected asbestos before booking. We need to confirm whether the job is suitable before agreeing a collection."),
+    ],
+    faqTitle: "Junk removal questions, answered",
+    ctaTitle: "Ready to get your space back?", ctaDescription: "Show us what needs to go. We’ll help you organise a fixed-price Auckland junk pickup.",
+  },
+  "rubbish-removal-auckland": {
+    label: "Rubbish removal", adGroup: "Rubbish Removal",
+    title: "Rubbish Removal Auckland | Household Pickups | Junk Removals",
+    description: "Household rubbish removal across Auckland, with lifting, loading and tip fees included. Ask about same-day availability and get a fixed quote from your photos.",
+    headline: "Rubbish removal Auckland. We’ll take it from here.",
+    intro: "Clearing out the house, finishing a small project or dealing with rubbish that will not fit in the bin? Our Auckland rubbish removal service handles the lifting, loading and trip to the tip. Send photos for a fixed quote.",
+    benefits: ["Household rubbish and mixed loads", "Labour, loading and tip fees included", "Same-day slots when available", "Locally owned and operated"],
+    formName: "Auckland Rubbish Removal Enquiry", image: sourceImage,
+    servicesTitle: "Rubbish pickups for everyday clear-outs",
+    servicesDescription: "From a one-off household collection to clearing a garage, tell us about the rubbish and we will help you work out the pickup.",
+    cards: [
+      card("Household rubbish", "Unwanted household items, bags and boxes that have built up around the home.", "household"),
+      card("End-of-tenancy rubbish", "Items left behind after a move or tenancy. Send photos of the rooms or piles to be cleared.", "tenancy"),
+      card("Garage & shed waste", "Stored clutter and unwanted contents. Point out sharp, heavy or unusual materials in your enquiry.", "clearance"),
+      card("Bulky rubbish", "Old furniture, mattresses and appliances that need more than an ordinary bin collection.", "furniture"),
+      card("Garden rubbish", "Branches, clippings and green waste from a garden tidy-up. Let us know if other materials are mixed in.", "garden"),
+      card("Small building clean-ups", "Offcuts, packaging and rubbish from small renovation jobs. Describe the materials and approximate amounts.", "building"),
+    ],
+    information: {
+      eyebrow: "A hands-on rubbish removal service", title: "No trailer to organise. No loading it yourself.",
+      description: "A private rubbish pickup is useful when you need help with the carrying as well as the disposal. Show us the job and we organise the collection with you.",
+      rows: [
+        { title: "We collect from the agreed location", text: "Tell us whether the rubbish is inside, out the back or in a garage. Stairs, narrow paths and parking are part of planning the job." },
+        { title: "Book a one-off pickup", text: "You do not need an ongoing collection contract. Ask us about a household load, a tenancy clean-up or a one-off mixed rubbish collection." },
+        { title: "Ask about an urgent collection", text: "If your rubbish needs to go soon, call with your suburb and a description of the load. We will check same-day or next-day availability." },
+      ],
+      aside: { title: "Before you send your photos", items: ["Show the full pile, not just the front", "Separate or describe different waste types", "Mention stairs and parking", "Flag paint, chemicals or unusual materials"], note: "We confirm the items and access before agreeing the collection." },
+    },
+    pricing: {
+      eyebrow: "Rubbish removal prices", title: "Know the price before the rubbish goes.",
+      description: "A household rubbish collection is priced around the amount, materials and access. Your agreed quote includes the crew’s labour, loading and tip fees.",
+      rows: [
+        { title: "Bags, bulky items or a mixed load", text: "Photos help us judge the amount of rubbish and how much space and loading time the job needs." },
+        { title: "Light rubbish or heavy materials", text: "A pile of packaging is different from a pile containing rubble or other dense materials. Describe heavy items so they can be allowed for." },
+        { title: "Easy access or extra carrying", text: "Tell us about stairs, lifts, rear access and where a collection vehicle can park. This helps keep the quoted scope clear." },
+      ], aside: included,
+    },
+    processTitle: "Rubbish sorted in 3 steps",
+    processCards: [
+      { title: "Send the details", description: "<p>Upload photos of your rubbish and tell us the suburb, access and when you would like it gone.</p>" },
+      { title: "Confirm the collection", description: "<p>We agree what is included, the fixed quote and an available pickup time with you.</p>" },
+      { title: "Leave the loading to us", description: "<p>Our crew collects the agreed rubbish and handles the transport and disposal.</p>" },
+    ],
+    faqs: [
+      question("Do you offer same-day rubbish removal in Auckland?", "Same-day collection may be available depending on your location, load and the schedule. Call us for the quickest availability check; a preferred day is confirmed when we arrange the job."),
+      question("What is included in my rubbish removal quote?", "The agreed job includes collection labour, loading, transport and tip fees. Tell us about all the items and access so the quote covers the full scope."),
+      question("Is this the Auckland Council inorganic collection?", "No. This is a private, paid rubbish removal service with a collection time agreed directly with you. For council dates, eligibility and accepted items, visit <a href=\"https://inorganiccollections.aucklandcouncil.govt.nz/Inorganic/\">Auckland Council’s inorganic collection information</a>."),
+      question("Is rubbish removal an alternative to hiring a skip bin?", "It can be, particularly if you want the crew to do the loading or only have a one-off pile to clear. A skip may suit a project where you need a container on site over several days and can load it yourself."),
+      question("Can you take rubbish left at a rental property?", "Send photos and a list of the items to be removed, along with your suburb and access details. We can discuss an end-of-tenancy clean-up and an available collection time."),
+      question("Can you collect every type of rubbish?", "We need to confirm the materials first. Please tell us about paint, liquids, chemicals, gas bottles, suspected asbestos and heavy building materials before booking."),
+    ],
+    faqTitle: "Household rubbish removal FAQs",
+    ctaTitle: "Let’s clear that rubbish.", ctaDescription: "Send a few photos and your Auckland suburb. Get a fixed quote with the loading included.",
+  },
+  "furniture-removal-auckland": {
+    label: "Furniture & couch removal", adGroup: "Furniture & Couch",
+    title: "Couch & Furniture Removal Auckland | Mattresses & Appliances",
+    description: "Dispose of old couches, sofas, mattresses, fridges and unwanted furniture in Auckland. We handle the lifting and loading. Get a fixed-price collection quote.",
+    headline: "Couch & furniture removal Auckland.",
+    intro: "New furniture arriving or an old sofa taking up space? We collect unwanted couches, mattresses, furniture and appliances across Auckland. Tell us about your items and access; we will quote for the lifting, loading and disposal.",
+    benefits: ["One couch or several bulky items", "Sofas, mattresses, fridges and more", "Tell us about stairs — we plan the lifting", "Fixed quote including loading and tip fees"],
+    formName: "Auckland Furniture and Couch Removal Enquiry", image: sourceImage,
+    servicesTitle: "The bulky items we can help with",
+    servicesDescription: "Whether you are replacing one item or clearing a whole room, photograph each piece and let us know where it needs collecting from.",
+    cards: [
+      card("Couch & sofa disposal", "Two-seaters, three-seaters and corner suites. Include the whole couch and mention if it is upstairs or needs to fit through tight access.", "furniture", "couch-disposal"),
+      card("Mattress removal", "Old mattresses and bed bases. Tell us the bed size and whether there are other bedroom items to include.", "household", "mattress-removal"),
+      card("Fridge removal", "Unwanted fridges and freezers. Include the size and access; discuss any preparation or disconnection before the pickup.", "appliances", "fridge-removal"),
+      card("Appliance removal", "Washing machines, dryers and other whiteware. Tell us what is being replaced and whether it is ready for collection.", "appliances", "appliance-removal"),
+      card("Tables & wardrobes", "Dining sets, drawers, shelves and wardrobes. Show the item dimensions and flag anything particularly heavy or awkward.", "furniture"),
+      card("Several items at once", "Replacing a lounge suite or clearing a room? Include every piece in one enquiry so we can quote for the whole collection.", "clearance"),
+    ],
+    information: {
+      eyebrow: "The carrying is part of the job", title: "Your old couch does not have to reach the kerb first.",
+      description: "Bulky furniture is awkward long before it reaches the truck. Give us the access details so the quote covers getting it out of the property as well as taking it away.",
+      rows: [
+        { title: "Stairs, lifts and narrow doors", text: "Mention the floor, stair layout or lift access. A photo of the route out is useful for a large sofa, fridge or wardrobe." },
+        { title: "Single pieces or a roomful", text: "A couch, mattress or appliance can be quoted on its own. If several items are going, show them together so we can plan one collection." },
+        { title: "Appliances and fitted furniture", text: "Tell us if an appliance is still connected or furniture is fixed in place. We need to confirm preparation and any dismantling before the job; specialist electrical or plumbing work is not assumed in a collection quote." },
+      ],
+      aside: { title: "Send these with your enquiry", items: ["A full photo of each item", "Size or dimensions for bulky pieces", "Photos of stairs or tight access", "Your suburb and preferred pickup time"], note: "Up to 10 photos fit in the same quote form. HEIC iPhone photos are supported." },
+    },
+    pricing: {
+      eyebrow: "Furniture disposal cost", title: "A price for the item and the lifting.",
+      description: "Couch disposal, mattress removal and fridge pickup are quoted around the pieces you have and how they need to come out of the property.",
+      rows: [
+        { title: "The piece and its size", text: "A single armchair needs different space and handling from a large corner sofa, a bed base or an upright fridge." },
+        { title: "Access to the collection point", text: "An upstairs pickup, narrow hallway or long carry can change the loading work. Send the details before we quote." },
+        { title: "Other items on the same visit", text: "If a mattress, sofa and washing machine are all going, list them in the same request. We quote for the full agreed collection." },
+      ], aside: included,
+    },
+    processTitle: "Old furniture gone in 3 steps",
+    processCards: [
+      { title: "Photograph your items", description: "<p>Show the couch, furniture or appliances, with a note about size, stairs and access.</p>" },
+      { title: "Agree the price & time", description: "<p>We confirm the pieces, preparation and fixed quote, then arrange an available collection slot.</p>" },
+      { title: "We handle the lifting", description: "<p>Our crew carries and loads the agreed items, leaving you free to use the space again.</p>" },
+    ],
+    faqs: [
+      question("How do I get rid of an old couch in Auckland?", "Send a photo of your sofa, your Auckland suburb and any access details. We will quote for collection, lifting, loading and disposal. You can include other furniture in the same request."),
+      question("Can you remove a couch from upstairs?", "Tell us the floor and send photos of the stairs, doors and couch. We will check that the access is suitable and allow for the carrying in your quote before agreeing the job."),
+      question("Do you collect mattresses and bed bases?", "Yes. Include the mattress size, whether a bed base is also going, and where the items are located when you request a quote."),
+      question("Do you offer fridge and appliance removal?", "We collect unwanted whiteware and appliances. Let us know the item size and whether it is disconnected and ready to move. Any preparation or specialist disconnection needs to be discussed before collection."),
+      question("Can my old furniture be donated?", "We look to reuse, donate or recycle suitable items where we can. Suitability depends on condition and whether an organisation can accept the item, so donation cannot be guaranteed."),
+      question("Can you pick up my couch today?", "Ask us about same-day or next-day availability. Your suburb, item size, access and the crew’s schedule determine the slots we can offer."),
+    ],
+    faqTitle: "Couch, mattress & appliance removal FAQs",
+    ctaTitle: "Make room for what’s next.", ctaDescription: "One couch or several bulky items: send photos and get a fixed-price collection quote.",
+  },
+  "rubbish-removal-cost-auckland": {
+    label: "Removal costs & pricing", adGroup: "Cost & Waste",
+    title: "Rubbish Removal Cost Auckland | Fixed-Price Quotes",
+    description: "Understand Auckland rubbish removal prices: load size, material, access and disposal. Get a fixed quote with labour, loading, transport and tip fees included.",
+    headline: "Rubbish removal cost Auckland. Get a clear price.",
+    intro: "Your rubbish removal price depends on the load, the materials and the access. Send photos of the full job for a fixed quote with labour, loading and tip fees included. Know what the collection will cost before work starts.",
+    benefits: ["Fixed price for your agreed collection", "Labour, loading and tip fees included", "One item, a mixed load or a clear-out", "Free quote, with no obligation"],
+    formName: "Auckland Rubbish Removal Pricing Enquiry", image: sourceImage,
+    servicesTitle: "What sort of load are you pricing?",
+    servicesDescription: "Choose the example closest to your job, then send photos and access details. We will quote for the actual collection you need.",
+    cards: [
+      card("A single bulky item", "An old couch, mattress or fridge. Include its size, your suburb and whether there are stairs or a long carry.", "furniture"),
+      card("A mixed rubbish load", "Bags, boxes, furniture or garden waste together. Show each type of material and the full amount to be collected.", "household"),
+      card("A property clear-out", "Several rooms, a garage or an end-of-tenancy clean-up. Send an overview plus photos of each area to be included.", "clearance"),
+    ],
+    information: {
+      eyebrow: "Compare your options", title: "Pickup, skip bin or a dump run?",
+      description: "The right option depends on how much waste you have, how long you need to collect it and whether you want to do the loading yourself.",
+      rows: [
+        { title: "A private rubbish pickup", text: "Useful for a one-off load or bulky items when you want a crew to carry and load them. Our quote includes the agreed collection work, transport and tip fees." },
+        { title: "Hiring a skip bin", text: "May suit a project that generates waste over several days and has room for a bin. Check the hire period, accepted materials, loading limits and any placement requirements with the provider." },
+        { title: "Doing your own dump run", text: "May suit a manageable load if you have suitable transport and can load and unload it. Compare vehicle hire or trailer costs, disposal fees and the time involved." },
+        { title: "Council inorganic collection", text: "For eligible household items, check Auckland Council’s collection service and available dates. Our service is a separate, private paid pickup arranged directly with you." },
+      ],
+      aside: { title: "Compare the full job", items: ["Who does the lifting and loading?", "Are transport and disposal included?", "Are your materials accepted?", "Does the timing work for you?"], note: "Give each provider the same item list and access details when comparing quotes." },
+    },
+    pricing: {
+      eyebrow: "How rubbish removal is priced", title: "Four details that shape your quote.",
+      description: "Looking for cheap rubbish removal? Start with a clear scope and an inclusive quote, so you can compare the total collection cost.",
+      rows: [
+        { title: "01 — The amount", text: "Tell us how many items, bags or piles there are. Photos from different angles help show the total load and the vehicle space it will need." },
+        { title: "02 — The materials", text: "Furniture, green waste and heavy renovation materials have different handling and disposal needs. Describe any dense, unusual or specialist waste." },
+        { title: "03 — The access", text: "Stairs, long carries, tight doorways and parking affect loading. Include them when you ask for a price, rather than adding them on collection day." },
+        { title: "04 — The location & timing", text: "Give us your Auckland suburb and preferred collection date. We can confirm available slots and include the collection arrangements in the quote." },
+      ], aside: included,
+    },
+    processTitle: "From photos to a fixed quote",
+    processCards: [
+      { title: "Show the full load", description: "<p>Add up to 10 photos, your suburb and any access details. Include all the items you want priced.</p>" },
+      { title: "Check your quote", description: "<p>We confirm the agreed items and collection work with a fixed price. Ask us about anything you are unsure is included.</p>" },
+      { title: "Choose your pickup", description: "<p>If the quote suits, arrange an available slot. Our crew handles the agreed lifting, loading and removal.</p>" },
+    ],
+    faqs: [
+      question("How much does rubbish removal cost in Auckland?", "The cost depends on the amount and type of waste, its weight, collection access and location. Send clear photos and your suburb for a fixed quote covering the agreed job, including labour, loading and tip fees."),
+      question("How much does couch or mattress disposal cost?", "Tell us the item, its size and how it needs to come out of the property. A single item at an easy-access collection point needs different work from a large upstairs couch, so we quote for your actual pickup."),
+      question("Are tip fees and loading included?", "Yes. Labour, loading, transport and tip fees are included in your quote for the agreed collection. Show us all the items and access details so the quoted scope is complete."),
+      question("Is a rubbish pickup cheaper than hiring a skip?", "It depends on the job. Compare the full cost of the skip hire, accepted materials, loading and time on site against a pickup quote that includes the crew doing the loading. We do not promise one option is always cheaper."),
+      question("Can I get a quote from a photo?", "Yes. Use the same quote form to send up to 10 photos. Include different angles, item sizes where useful, your suburb and any stairs or parking restrictions."),
+      question("Is this a free inorganic rubbish collection?", "This is a private paid service. For Auckland Council’s inorganic collection dates, eligibility and accepted items, check <a href=\"https://inorganiccollections.aucklandcouncil.govt.nz/Inorganic/\">the council’s inorganic collection information</a>. If you need another collection option, ask us for a quote."),
+    ],
+    faqTitle: "Rubbish removal prices: your questions",
+    ctaTitle: "Get a price for your actual load.", ctaDescription: "Send photos and a few collection details. We’ll provide a free, no-obligation quote.",
+  },
+};
+
+export const LANDING_PAGE_LINKS = Object.entries(SERVICE_LANDING_PAGES).map(([slug, page]) => ({ slug, label: page.label, adGroup: page.adGroup }));
+export function getServiceLandingPage(slug) {
+  return Object.hasOwn(SERVICE_LANDING_PAGES, slug) ? SERVICE_LANDING_PAGES[slug] : null;
+}

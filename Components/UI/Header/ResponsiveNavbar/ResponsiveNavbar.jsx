@@ -54,6 +54,7 @@ ElevationScroll.propTypes = {
 };
 
 export default function ResponsiveNavbar(props) {
+  const sectionHref = href => props.localSections && href.startsWith("/#") ? href.slice(1) : href;
   const theme = useTheme();
   const pathname = usePathname();
   const [desktopMenuIndex, setDesktopMenuIndex] = useState(-1);
@@ -85,12 +86,27 @@ export default function ResponsiveNavbar(props) {
         component="li"
         key={item.id || item.label}
         sx={{ color: "white", display: "block", position: "relative" }}
-        onMouseEnter={() => setDesktopMenuIndex(index)}
-        onMouseLeave={() => setDesktopMenuIndex(-1)}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) setDesktopMenuIndex(-1);
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") {
+            setDesktopMenuIndex(-1);
+            event.currentTarget.querySelector("button")?.focus();
+          }
+        }}
       >
-        <Box className="nav-trigger" sx={{ display: "flex", alignItems: "center" }}>
+        <Box
+          component={item.subLinks ? "button" : "div"}
+          type={item.subLinks ? "button" : undefined}
+          className="nav-trigger"
+          aria-expanded={item.subLinks ? isOpen : undefined}
+          aria-controls={item.subLinks ? `desktop-nav-${item.id}` : undefined}
+          onClick={item.subLinks ? () => setDesktopMenuIndex(isOpen ? -1 : index) : undefined}
+          sx={{ display: "flex", alignItems: "center" }}
+        >
           {!item.subLinks ? (
-            <Link href={item.url}>
+            <Link href={sectionHref(item.url)}>
               <Typography component="span" variant="body1" align="center">
                 {item.label}
               </Typography>
@@ -114,6 +130,7 @@ export default function ResponsiveNavbar(props) {
         {item.subLinks ? (
           <Paper
             component="ul"
+            id={`desktop-nav-${item.id}`}
             variant="outlined"
             className="sublinks-container"
             sx={{
@@ -122,12 +139,14 @@ export default function ResponsiveNavbar(props) {
               pointerEvents: isOpen ? "auto" : "none",
               transform: isOpen ? "scaleY(1)" : "scaleY(0)",
               opacity: isOpen ? 1 : 0,
+              display: isOpen ? "grid" : "none",
             }}
           >
             {item.subLinks.map((subLink) => (
               <li key={subLink.url}>
                 <Link
-                  href={subLink.url}
+                  href={sectionHref(subLink.url)}
+                  aria-current={pathname === subLink.url ? "page" : undefined}
                   passHref
                   onClick={() => setTimeout(() => setDesktopMenuIndex(-1), 200)}
                 >
@@ -160,17 +179,22 @@ export default function ResponsiveNavbar(props) {
 
   const mobileMenuItems = headerLinks.map((item, index) => (
     <li className="flex-auto text-center relative parent-list-item" key={item.id || item.label}>
-      <a
-        href={item.url}
+      <Box
+        component={item.subLinks ? "button" : "a"}
+        type={item.subLinks ? "button" : undefined}
+        href={item.subLinks ? undefined : sectionHref(item.url)}
+        aria-expanded={item.subLinks ? mobileMenuIndex === index : undefined}
+        aria-controls={item.subLinks ? `mobile-nav-${item.id}` : undefined}
         className={`parent-link body1 ${pathname === item.url ? "active" : ""}`}
         onClick={(event) => handleMobileParentClick(event, item, index)}
       >
         {item.label}
         {item.subLinks ? <ArrowIcon className="arrow" /> : null}
-      </a>
+      </Box>
 
       {item.subLinks ? (
         <ul
+          id={`mobile-nav-${item.id}`}
           className={`${
             mobileMenuIndex === index ? "block" : "hidden"
           } bg-primary-light text-surface-light top-8 dropdown`}
@@ -185,7 +209,7 @@ export default function ResponsiveNavbar(props) {
                 key={`${subLink.url}-${subIndex}`}
                 style={{ borderColor: "rgba(255,255,255,0.1)" }}
               />
-              <Link href={subLink.url} className="child-link">
+              <Link href={sectionHref(subLink.url)} className="child-link" aria-current={pathname === subLink.url ? "page" : undefined}>
                 {subLink.graphic ? (
                   <Image
                     className="icon-wrapper border-radius-8"
@@ -307,7 +331,7 @@ export default function ResponsiveNavbar(props) {
                   >
                     {desktopMenuItems}
                   </Box>
-                  <Link href="/#get-free-quote" className="quote-button">
+                  <Link href={sectionHref("/#get-free-quote")} className="quote-button">
                     <Button size="large" variant="contained">
                       GET FREE QUOTE
                     </Button>
@@ -345,7 +369,7 @@ export default function ResponsiveNavbar(props) {
           onClose={handleDrawerClose}
         >
           <DrawerHeader>
-            <IconButton onClick={handleDrawerClose}>
+            <IconButton onClick={handleDrawerClose} aria-label="Close navigation menu">
               {theme.direction === "ltr" ? (
                 <ChevronLeftIcon className="chevron-left-icon" />
               ) : (
@@ -354,7 +378,7 @@ export default function ResponsiveNavbar(props) {
             </IconButton>
           </DrawerHeader>
           <ul className="list-container">{mobileMenuItems}</ul>
-          <Link href="/" style={{ margin: "16px" }}>
+          <Link href={sectionHref("/#get-free-quote")} style={{ margin: "16px" }}>
             <Button
               size="large"
               variant="outlined"

@@ -40,6 +40,7 @@
 }
 
 .card {
+  scroll-margin-top: 145px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -55,6 +56,8 @@
     border-color: var(--light-primary);
   }
 }
+
+.threeColumns { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
 .iconWrapper {
   display: flex;

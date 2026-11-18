@@ -4,6 +4,8 @@ import Copyright from "./Copyright";
 import ContactInfo from "./ContactInfo";
 import FooterCta from "../CTA/FooterCta";
 import styles from "./Footer.module.scss";
+import Link from "next/link";
+import { LANDING_PAGE_LINKS } from "@/utils/serviceLandingPages.mjs";
 export default function Footer({
   footerCtaData,
   showFooterCta = true,
@@ -43,6 +45,9 @@ Tell us what needs to go and get a fixed-price quote for junk removal across Auc
 
             </div>
           </div>
+          <nav className={styles.serviceLinks} aria-label="Removal services">
+            {LANDING_PAGE_LINKS.map(page => <Link key={page.slug} href={`/${page.slug}`}>{page.label}</Link>)}
+          </nav>
         </Container>
       </div>
       {/* copyright container */}

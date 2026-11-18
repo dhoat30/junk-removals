@@ -45,6 +45,8 @@
   font-weight: 600 !important;
 }
 
+.titleUSP svg path { stroke: currentColor; }
+
 .title {
   color: var(--brand-charcoal);
   letter-spacing: -0.04em;

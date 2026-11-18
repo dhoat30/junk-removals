@@ -16,6 +16,7 @@ export default function LandingPageHeroSection({
   aboveTitleUsp,
   trustSnippet,
   image,
+  formName,
 }) {
   const phoneNumber = process.env.NEXT_PUBLIC_PHONE_NUMBER;
   const trustSnippetDescription =
@@ -138,7 +139,7 @@ export default function LandingPageHeroSection({
           </div>
 
           <div className={styles.formColumn} id="get-free-quote">
-            <MovingQuoteLeadForm className={styles.heroForm} />
+            <MovingQuoteLeadForm className={styles.heroForm} formName={formName} />
           </div>
         </div>
       </div>

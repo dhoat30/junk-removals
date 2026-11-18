@@ -938,6 +938,10 @@ strong {
 
   .link {
     >.nav-trigger {
+      border: 0;
+      background: transparent;
+      font: inherit;
+      &:focus-visible { outline: 2px solid var(--light-primary); outline-offset: -4px; border-radius: 8px; }
       padding: 16px 24px;
       cursor: pointer;
       color: var(--light-on-surface);
@@ -998,7 +1002,8 @@ strong {
     overflow: auto;
     display: grid;
 
-    gap: 32px;
+    gap: 4px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .1);
 
     .icon-wrapper {
       padding: 8px;
@@ -1009,7 +1014,11 @@ strong {
     li {
       a {
         display: grid;
-        grid-template-columns: 48px auto;
+        grid-template-columns: auto;
+        padding: 12px;
+        border-radius: 8px;
+        &:hover, &:focus-visible, &[aria-current="page"] { background: var(--brand-mist); }
+        &:focus-visible { outline: 2px solid var(--light-primary); }
         gap: 8px;
         align-items: center;
 
@@ -1069,6 +1078,12 @@ strong {
 
     .parent-list-item {
       .parent-link {
+        width: 100%;
+        border: 0;
+        background: transparent;
+        font-family: inherit;
+        cursor: pointer;
+        &:focus-visible { outline: 2px solid var(--light-primary); outline-offset: -3px; }
         display: block;
         text-align: left;
         padding: 16px 16px;
@@ -1103,7 +1118,7 @@ strong {
         font-weight: 400;
         position: relative;
         display: grid;
-        grid-template-columns: 40px auto;
+        grid-template-columns: auto;
         gap: 8px;
         align-items: center;
 
@@ -1120,6 +1135,7 @@ strong {
         &:hover {
           color: var(--light-primary);
         }
+        &[aria-current="page"] { background: var(--brand-mist); color: var(--light-primary); }
       }
     }
   }
