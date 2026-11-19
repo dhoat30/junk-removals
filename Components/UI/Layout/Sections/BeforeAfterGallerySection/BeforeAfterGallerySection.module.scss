@@ -1,9 +1,7 @@
 .section {
   padding: 88px 0;
   scroll-margin-top: 116px;
-  background:
-    radial-gradient(circle at 88% 18%, rgba(var(--brand-accent-rgb), 0.12), transparent 24%),
-    linear-gradient(180deg, var(--light-background) 0%, var(--brand-mist) 100%);
+  background: var(--brand-mist);
 
   @media (max-width: 1199px) {
     scroll-margin-top: 98px;

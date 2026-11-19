@@ -54,9 +54,7 @@
 }
 
 .card {
-  background:
-    radial-gradient(circle at top right, rgba(var(--brand-accent-rgb), 0.12), transparent 26%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 244, 244, 0.96) 100%);
+  background: #fff;
   border: 1px solid rgba(var(--brand-red-rgb), 0.1);
   border-radius: 24px;
   box-shadow: 0 20px 54px rgba(var(--brand-red-rgb), 0.07);

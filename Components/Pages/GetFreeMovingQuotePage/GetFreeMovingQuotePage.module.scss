@@ -1,7 +1,5 @@
 .page {
-  background:
-    radial-gradient(circle at top left, rgba(var(--brand-accent-rgb), 0.16), transparent 35%),
-    linear-gradient(180deg, var(--brand-mist) 0%, var(--light-background) 100%);
+  background: var(--brand-mist);
   padding-top: 0;
 }
 

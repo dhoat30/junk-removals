@@ -1,9 +1,7 @@
 .section {
   padding: 88px 0;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 10% 18%, rgba(var(--brand-accent-rgb), 0.12), transparent 28%),
-    linear-gradient(180deg, var(--light-background) 0%, var(--brand-mist) 100%);
+  background: var(--brand-mist);
 
   @media (max-width: 700px) {
     padding: 56px 0;
@@ -110,9 +108,7 @@
   gap: 18px;
   border: 1px solid rgba(var(--brand-red-rgb), 0.1);
   border-radius: 24px;
-  background:
-    radial-gradient(circle at top right, rgba(var(--brand-accent-rgb), 0.12), transparent 24%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 244, 244, 0.94) 100%);
+  background: #fff;
   box-shadow: 0 18px 46px rgba(var(--brand-red-rgb), 0.07);
   padding: 26px 24px;
 
@@ -121,7 +117,7 @@
     width: 48px;
     height: 4px;
     border-radius: 999px;
-    background: linear-gradient(90deg, var(--light-tertiary) 0%, var(--light-primary) 100%);
+    background: var(--brand-red);
   }
 }
 

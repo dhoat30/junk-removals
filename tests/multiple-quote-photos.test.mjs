@@ -11,7 +11,7 @@ const photos = Array.from({ length: 10 }, (_, i) => new File([png], `photo-${i +
 const payload = {
   portalID: '123456', hubspotFormID: '12345678-abcd-1234-abcd-123456789abc',
   email: 'customer@example.com', formName: 'Test quote', message: 'Items for removal',
-  hubspotFileField: 'junk_photo', hubspotFormObject: [{ name: 'email', value: 'customer@example.com' }, { name: 'phone', value: '0271234567' }],
+  hubspotFileField: 'junk_photo', hubspotFormObject: [{ name: 'email', value: 'customer@example.com' }, { name: 'phone', value: '0271234567' }, { name: 'hs_google_click_id', value: 'test-gclid' }],
 };
 const request = (images, count = images.length) => {
   const body = new FormData();
@@ -91,9 +91,11 @@ test('HubSpot receives ten files together and submits their confirmed upload GUI
       assert.match(url, /submissions\/v3\/public\/submit\/formsnext\/multipart/);
       assert.equal(options.body.get('0-1/email'), payload.email);
       assert.equal(options.body.get('0-1/phone'), '0271234567');
+      assert.equal(options.body.get('0-1/hs_google_click_id'), 'test-gclid');
       assert.equal(options.body.get('0-1/junk_photo'), uploadGuid);
       const context = JSON.parse(options.body.get('hs_context'));
       assert.equal(context.fieldValues['0-1/junk_photo'], uploadGuid);
+      assert.equal(context.fieldValues['0-1/hs_google_click_id'], 'test-gclid');
       assert.equal(context.formDefinitionUpdatedAt, 12345);
       const result = { accepted: true, formGuid: payload.hubspotFormID };
       return html ? new Response(`<html><script>window.parent.postMessage(${JSON.stringify(result)}, '*');</script></html>`) : Response.json(result);

@@ -21,6 +21,7 @@ import { useClickIds } from "@/hooks/useClickIds";
 import { sendFormSubmissionToGoogleTagManager } from "@/utils/googleTagManager";
 import styles from "./MovingQuoteLeadForm.module.scss";
 import { submitQuote } from "@/utils/submitQuote.mjs";
+import { hubspotClickIdFields } from "@/utils/hubspotClickId.mjs";
 
 const FORM_FIELDS = [
   {
@@ -240,6 +241,7 @@ Submitted: ${dayjs(formattedDate).format("DD/MM/YYYY HH:mm")}`;
         { name: "phone", value: formData.phone },
         { name: "property_address", value: formData.address },
         { name: "message", value: formData.message.trim() },
+        ...hubspotClickIdFields(clickIds),
       ],
     };
 

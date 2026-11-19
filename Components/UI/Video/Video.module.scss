@@ -19,11 +19,7 @@
 height: 120%; 
       border-radius: 244px; 
       /* Gradient fill */
-      background: radial-gradient(
-        circle at center,
-        rgb(255, 180, 171) 0%,
-        rgb(239, 53, 53) 100%
-      );
+      background: transparent;
       /* Blur to get the glow effect */
       filter: blur(100px);
       /* Optional extras */
